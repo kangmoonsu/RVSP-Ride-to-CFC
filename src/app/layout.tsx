@@ -8,7 +8,7 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: 'The Sanctuary - Church Rides',
+  title: 'CFC - Church Rides',
   description: 'Coordinate rides for Sunday Service.',
 }
 

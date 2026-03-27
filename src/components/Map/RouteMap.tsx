@@ -1,26 +1,7 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import { useEffect } from 'react';
-import L from 'leaflet';
-
-// Fix for default Leaflet icons in Next.js
-const iconUrl = 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png';
-const iconRetinaUrl = 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png';
-const shadowUrl = 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png';
-
-const DefaultIcon = L.icon({
-  iconUrl,
-  iconRetinaUrl,
-  shadowUrl,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-  shadowSize: [41, 41]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+import { GoogleMap, Marker, Polyline, useJsApiLoader } from '@react-google-maps/api';
+import { useEffect, useRef } from 'react';
 
 export interface StopData {
   id: string;
@@ -33,60 +14,97 @@ export interface StopData {
 export interface RouteMapProps {
   stops: StopData[];
   onMapClick?: (lat: number, lng: number) => void;
+  onMarkerDragEnd?: (stopId: string, lat: number, lng: number) => void;
   height?: string;
   routePath?: [number, number][]; // Arr of [lat, lng] for polyline
   driverLocation?: { lat: number, lng: number } | null;
 }
 
-export default function RouteMap({ stops, onMapClick, height = '400px', routePath = [], driverLocation = null }: RouteMapProps) {
-  // Default center (can be somewhere central, or first stop)
-  const defaultCenter: [number, number] = stops.length > 0 ? [stops[0].lat, stops[0].lng] : [34.0522, -118.2437]; // Default to LA for now
+const libraries: "places"[] = ["places"];
+
+export default function RouteMap({ stops, onMapClick, onMarkerDragEnd, height = '400px', routePath = [], driverLocation = null }: RouteMapProps) {
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    libraries,
+  });
+
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  const defaultCenter = stops.length > 0 && stops[0].lat !== 0 ? { lat: stops[0].lat, lng: stops[0].lng } : { lat: 34.0522, lng: -118.2437 };
+
+  // Fit bounds when stops change
+  useEffect(() => {
+    if (mapRef.current && stops.length > 0) {
+      const validStops = stops.filter(s => s.lat !== 0 && s.lng !== 0 && !isNaN(s.lat) && !isNaN(s.lng));
+      if (validStops.length > 0) {
+        if (validStops.length === 1) {
+          mapRef.current.panTo({ lat: validStops[0].lat, lng: validStops[0].lng });
+          mapRef.current.setZoom(14);
+        } else {
+          const bounds = new window.google.maps.LatLngBounds();
+          validStops.forEach(s => bounds.extend({ lat: s.lat, lng: s.lng }));
+          mapRef.current.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
+        }
+      }
+    }
+  }, [stops]);
+
+  if (loadError) return <div className="p-4 bg-error-container text-on-error-container rounded-2xl">Error loading Google Maps</div>;
+  if (!isLoaded) return <div className="flex h-full w-full items-center justify-center p-4">Loading maps...</div>;
 
   return (
     <div style={{ height, width: '100%' }} className="rounded-[1.5rem] overflow-hidden shadow-sm border border-outline-variant/20 relative z-0">
-      <MapContainer center={defaultCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        
+      <GoogleMap
+        mapContainerStyle={{ height: '100%', width: '100%' }}
+        center={defaultCenter}
+        zoom={13}
+        onLoad={(map) => { mapRef.current = map; }}
+        onClick={(e) => {
+          if (onMapClick && e.latLng) {
+            onMapClick(e.latLng.lat(), e.latLng.lng());
+          }
+        }}
+        options={{ disableDefaultUI: true, zoomControl: true }}
+      >
         {stops.map((stop) => (
-          <Marker key={stop.id} position={[stop.lat, stop.lng]}>
-            <Popup>
-              <strong>{stop.sequence}. {stop.name}</strong>
-            </Popup>
-          </Marker>
+          stop.lat !== 0 ? (
+            <Marker
+              key={stop.id}
+              position={{ lat: stop.lat, lng: stop.lng }}
+              draggable={!!onMarkerDragEnd}
+              label={{ text: stop.sequence.toString(), color: 'white', fontWeight: 'bold' }}
+              title={stop.name}
+              onDragEnd={(e) => {
+                if (onMarkerDragEnd && e.latLng) {
+                  onMarkerDragEnd(stop.id, e.latLng.lat(), e.latLng.lng());
+                }
+              }}
+            />
+          ) : null
         ))}
 
         {routePath.length > 0 && (
-          <Polyline positions={routePath} color="hsl(168, 100%, 10%)" weight={4} opacity={0.7} />
+          <Polyline 
+            path={routePath.map(p => ({ lat: p[0], lng: p[1] }))} 
+            options={{ strokeColor: 'hsl(168, 100%, 15%)', strokeOpacity: 0.8, strokeWeight: 5 }} 
+          />
         )}
         
         {driverLocation && (
-          <Marker position={[driverLocation.lat, driverLocation.lng]}>
-             <Popup>
-               <strong>Driver's Live Location</strong>
-             </Popup>
-          </Marker>
+           <Marker 
+             position={{ lat: driverLocation.lat, lng: driverLocation.lng }} 
+             icon={{
+               path: window.google.maps.SymbolPath.CIRCLE,
+               scale: 8,
+               fillColor: '#4285F4',
+               fillOpacity: 1,
+               strokeColor: '#ffffff',
+               strokeWeight: 2,
+             }}
+             title="Driver Live GPS"
+           />
         )}
-
-        {/* Simple click handler wrapper for the map */}
-        <MapEventsHandler onMapClick={onMapClick} />
-      </MapContainer>
+      </GoogleMap>
     </div>
   );
-}
-
-// Separate component to handle map events because useMapEvents needs to be inside MapContainer
-import { useMapEvents } from 'react-leaflet';
-
-function MapEventsHandler({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) {
-  useMapEvents({
-    click(e) {
-      if (onMapClick) {
-        onMapClick(e.latlng.lat, e.latlng.lng);
-      }
-    },
-  });
-  return null;
 }

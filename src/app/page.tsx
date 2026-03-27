@@ -25,69 +25,103 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Hero Section */}
-      <main className="flex-grow flex flex-col items-center justify-center px-6 z-10 text-center relative max-w-4xl mx-auto pb-20">
+      {/* Main Content Section */}
+      <main className="grow flex flex-col items-center justify-center px-6 z-10 relative max-w-5xl mx-auto py-12 w-full">
         
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-secondary-container/50 text-on-secondary-container px-4 py-1.5 text-sm font-bold rounded-full mb-8 border border-secondary/10 shadow-sm animate-fade-in">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
-          </span>
-          Routing Made Simple
+        <div className="text-center mb-12 animate-fade-in">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-on-surface tracking-tight mb-4 font-headline">
+            Welcome to Church Rides
+          </h2>
+          <p className="text-on-surface-variant text-lg font-medium">
+            Follow the directions below to manage your routes or reserve a ride for Sunday service.
+          </p>
         </div>
-
-        {/* Hero Headline */}
-        <h2 className="text-5xl md:text-7xl font-extrabold text-on-surface tracking-tight leading-[1.1] mb-6 font-headline">
-          Sunday Service Rides, <br className="hidden md:block"/>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Reimagined.</span>
-        </h2>
         
-        {/* Description */}
-        <p className="text-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
-          Whether you need a ride to service or have extra seats in your car, Church Rides connects our community quickly and securely using dynamic GPS routing.
-        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+          
+          {/* Driver Directions */}
+          <div className="bg-surface-container rounded-3xl p-8 border border-outline-variant/30 flex flex-col relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
+            <div className="w-14 h-14 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center mb-6 shadow-sm">
+              <span className="material-symbols-outlined text-[28px]">directions_car</span>
+            </div>
+            <h3 className="text-2xl font-bold text-on-surface mb-2 font-headline">Drivers: Create a Route</h3>
+            <p className="text-on-surface-variant mb-6 text-sm">How to manage your capacity and pickups.</p>
+            
+            <div className="bg-surface rounded-2xl p-5 border border-outline-variant/20 mb-8 grow">
+              <ol className="space-y-4">
+                <li className="flex gap-3 text-on-surface-variant">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">1</span>
+                  <span><strong>Log in</strong> to your account and open the Driver Dashboard.</span>
+                </li>
+                <li className="flex gap-3 text-on-surface-variant">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">2</span>
+                  <span>Click <strong>"Create Route"</strong> and set your vehicle capacity and starting location.</span>
+                </li>
+                <li className="flex gap-3 text-on-surface-variant">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">3</span>
+                  <span>Review map updates automatically adding nearby riders to your route.</span>
+                </li>
+                <li className="flex gap-3 text-on-surface-variant">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">4</span>
+                  <span>On Sunday, select <strong>"Start Route"</strong> to track your real-time progress.</span>
+                </li>
+              </ol>
+            </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <Link 
-            href="/signup" 
-            className="w-full sm:w-auto bg-primary text-on-primary font-bold py-4 px-8 rounded-full shadow-xl shadow-primary/20 hover:bg-primary-container hover:text-on-primary-container hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 text-lg"
-          >
-            Join the Community
-            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
-          </Link>
-          <Link 
-            href="/login" 
-            className="w-full sm:w-auto bg-surface-container-low text-on-surface font-bold py-4 px-8 rounded-full border border-outline-variant/30 hover:bg-surface-container hover:border-outline-variant transition-all duration-300 flex items-center justify-center gap-2 text-lg"
-          >
-            Sign In
-          </Link>
+            <Link 
+              href="/login" 
+              className="mt-auto w-full bg-primary text-on-primary font-bold py-3.5 px-6 rounded-xl shadow-sm hover:bg-primary-container hover:text-on-primary-container hover:shadow-md transition-all flex items-center justify-center gap-2"
+            >
+              Access Driver Dashboard
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </Link>
+          </div>
+
+          {/* Rider Directions */}
+          <div className="bg-surface-container rounded-3xl p-8 border border-outline-variant/30 flex flex-col relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
+            <div className="w-14 h-14 rounded-2xl bg-secondary-container text-on-secondary-container flex items-center justify-center mb-6 shadow-sm">
+              <span className="material-symbols-outlined text-[28px]">person_raised_hand</span>
+            </div>
+            <h3 className="text-2xl font-bold text-on-surface mb-2 font-headline">Riders: Reserve a Ride</h3>
+            <p className="text-on-surface-variant mb-6 text-sm">How to secure a seat for Sunday service.</p>
+            
+            <div className="bg-surface rounded-2xl p-5 border border-outline-variant/20 mb-8 flex-grow">
+              <ol className="space-y-4">
+                <li className="flex gap-3 text-on-surface-variant">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">1</span>
+                  <span><strong>Log in</strong> your account and open the Rider Dashboard.</span>
+                </li>
+                <li className="flex gap-3 text-on-surface-variant">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">2</span>
+                  <span>Submit a <strong>Ride Request</strong> by confirming your pickup address.</span>
+                </li>
+                <li className="flex gap-3 text-on-surface-variant">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">3</span>
+                  <span>Wait for a driver to be assigned; you will be notified once confirmed.</span>
+                </li>
+                <li className="flex gap-3 text-on-surface-variant">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">4</span>
+                  <span>View the <strong>Live Map</strong> on Sunday morning to see driver ETA.</span>
+                </li>
+              </ol>
+            </div>
+
+            <Link 
+              href="/login" 
+              className="mt-auto w-full bg-secondary text-on-secondary font-bold py-3.5 px-6 rounded-xl shadow-sm hover:bg-secondary-container hover:text-on-secondary-container hover:shadow-md transition-all flex items-center justify-center gap-2"
+            >
+              Access Rider Dashboard
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </Link>
+          </div>
+
         </div>
-
-        {/* Quick Highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 text-left w-full border-t border-outline-variant/20 pt-16">
-          <div className="flex flex-col gap-3">
-             <div className="w-12 h-12 rounded-2xl bg-secondary-container text-on-secondary-container flex items-center justify-center mb-2">
-               <span className="material-symbols-outlined text-[24px]">map</span>
-             </div>
-             <h3 className="text-xl font-bold text-on-surface">Dynamic GPS Routing</h3>
-             <p className="text-on-surface-variant text-sm leading-relaxed">Smart mapping directs drivers to multiple stops effortlessly, reducing trip times.</p>
-          </div>
-          <div className="flex flex-col gap-3">
-             <div className="w-12 h-12 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center mb-2">
-               <span className="material-symbols-outlined text-[24px]">groups</span>
-             </div>
-             <h3 className="text-xl font-bold text-on-surface">Community Focused</h3>
-             <p className="text-on-surface-variant text-sm leading-relaxed">Built for safety and connection, ensuring everyone gets to church safely.</p>
-          </div>
-          <div className="flex flex-col gap-3">
-             <div className="w-12 h-12 rounded-2xl bg-tertiary-container text-on-tertiary-container flex items-center justify-center mb-2">
-               <span className="material-symbols-outlined text-[24px]">satellite_alt</span>
-             </div>
-             <h3 className="text-xl font-bold text-on-surface">Live Tracking</h3>
-             <p className="text-on-surface-variant text-sm leading-relaxed">Riders can track drivers approaching their stop in real-time, preventing missed pickups.</p>
-          </div>
+        
+        <div className="mt-12 text-center text-sm text-on-surface-variant bg-surface-container-low px-6 py-3 rounded-full border border-outline-variant/30 flex items-center gap-2">
+          <span className="material-symbols-outlined text-[18px]">info</span>
+          If you don't have an account yet, <Link href="/signup" className="text-primary font-bold hover:underline mx-1">Sign Up Here</Link> first.
         </div>
 
       </main>

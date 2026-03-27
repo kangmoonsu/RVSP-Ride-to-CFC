@@ -58,3 +58,42 @@ export async function getRiderBookings(riderId: string) {
 
   return data
 }
+
+export async function approveBooking(bookingId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  // Update status
+  const { data: updatedBooking, error } = await supabase
+    .from('ride_bookings')
+    .update({ status: 'confirmed' })
+    .eq('id', bookingId)
+    .select('*, rider:users!ride_bookings_rider_id_fkey(email, full_name), run:route_runs(scheduled_date, route:routes(name))')
+    .single()
+
+  if (error || !updatedBooking) {
+    throw new Error(error?.message || 'Update failed')
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY
+  if (resendApiKey) {
+    const { Resend } = await import('resend')
+    const resend = new Resend(resendApiKey)
+    const riderEmail = updatedBooking.rider?.email
+    const riderName = updatedBooking.rider?.full_name
+    const routeName = updatedBooking.run?.route?.name || 'Your Route'
+    
+    await resend.emails.send({
+      from: 'CFC Rides <contact.michaeldev@gmail.com>', // Change to verified domain when ready
+      to: [riderEmail],
+      subject: `Your Ride for ${routeName} is Confirmed!`,
+      html: `<p>Hello ${riderName},</p><p>Your driver has just formally approved your seat for <strong>${routeName}</strong> on ${new Date(updatedBooking.run?.scheduled_date).toLocaleString()}.</p><p>Get ready!</p>`
+    })
+  } else {
+    console.log(`[SIMULATED EMAIL] To: ${updatedBooking.rider?.email} - Your ride is confirmed!`)
+  }
+
+  revalidatePath('/driver/dashboard')
+  revalidatePath('/rider/dashboard')
+}

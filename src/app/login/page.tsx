@@ -10,7 +10,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <header className="fixed top-0 w-full z-50 bg-[#f9f9f8]/80 backdrop-blur-xl flex justify-between items-center px-6 py-6">
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary text-2xl" aria-hidden="true">church</span>
-          <span className="text-xl font-bold text-primary tracking-tight font-headline">The Sanctuary</span>
+          <span className="text-xl font-bold text-primary tracking-tight font-headline">CFC</span>
         </div>
       </header>
 
@@ -95,7 +95,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               </Link>
               <div className="h-px w-12 bg-outline-variant/30 mx-auto"></div>
               <p className="text-on-surface-variant text-sm">
-                New to The Sanctuary? 
+                New to CFC? 
                 <Link className="text-primary font-bold hover:underline decoration-2 underline-offset-4 ml-1" href="/signup">
                   Create an account
                 </Link>

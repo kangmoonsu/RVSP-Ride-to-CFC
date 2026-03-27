@@ -53,17 +53,11 @@ export async function updateSession(request: NextRequest) {
 
     // Role-based access control checking
     const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single()
-    const role = profile?.role
+    const role = profile?.role || 'rider'
 
     const path = request.nextUrl.pathname
     
     if (path.startsWith('/coordinator') && role !== 'coordinator') {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-    if (path.startsWith('/driver') && role !== 'driver' && role !== 'coordinator') {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-    if (path.startsWith('/rider') && role !== 'rider' && role !== 'coordinator') {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }

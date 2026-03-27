@@ -31,7 +31,12 @@ export default function LiveRiderTracker({ runId, stops }: { runId: string, stop
   // Our RouteMap component only accepts `stops`. We'll need to modify it slightly or add a special prop.
   return (
     <div className="w-full h-[300px] mt-4 relative">
-      <DynamicMap stops={stops} height="300px" driverLocation={driverLocation} />
+      <DynamicMap 
+        stops={stops} 
+        height="300px" 
+        driverLocation={driverLocation} 
+        routePath={stops.filter(s => s.lat && s.lng).map(s => [s.lat, s.lng]) as [number, number][]} 
+      />
       {/* Note: We will need to update RouteMap to accept driverLocation overlay */}
       {driverLocation && (
         <div className="absolute top-2 right-2 bg-on-surface text-surface py-1 px-3 rounded-full text-xs font-bold z-[1000] shadow-md flex items-center gap-2">

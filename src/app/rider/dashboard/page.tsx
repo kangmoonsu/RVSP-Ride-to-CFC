@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { getActiveRuns } from '@/app/actions/runs';
 import { getRiderBookings, createBooking } from '@/app/actions/bookings';
+import { signOut } from '@/app/actions/auth';
 import Link from 'next/link';
 import LiveRiderTracker from '@/components/Map/LiveRiderTracker';
 
@@ -13,10 +14,17 @@ export default async function RiderDashboard() {
     redirect('/login');
   }
 
-  const { data: dbUser } = await supabase.from('users').select('*').eq('id', user.id).single();
+  let { data: dbUser } = await supabase.from('users').select('*').eq('id', user.id).single();
 
   if (!dbUser) {
-    redirect('/login');
+    const newUser = {
+      id: user.id,
+      email: user.email || '',
+      full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+      role: 'rider' as const,
+    };
+    const { data: createdUser } = await supabase.from('users').insert(newUser).select().single();
+    dbUser = createdUser || newUser;
   }
 
   const [activeRuns, myBookings] = await Promise.all([
@@ -34,7 +42,15 @@ export default async function RiderDashboard() {
             <p className="text-on-surface-variant text-lg mt-2 font-medium">Welcome back, {dbUser.full_name}</p>
           </div>
           <div className="flex items-center gap-4">
-             <form action="/auth/signout" method="post">
+             <Link href="/" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 font-bold px-4 py-2 rounded-xl hover:bg-primary/10">
+               <span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+               Back
+             </Link>
+             <Link href="/driver/dashboard" className="bg-secondary text-on-secondary hover:bg-secondary-container hover:text-on-secondary-container transition-colors flex items-center gap-2 font-bold px-4 py-2 rounded-xl shadow-sm">
+               <span className="material-symbols-outlined" aria-hidden="true">directions_car</span>
+               Switch to Driver
+             </Link>
+             <form action={signOut}>
                 <button type="submit" className="text-on-surface-variant hover:text-error transition-colors flex items-center gap-2 font-bold px-4 py-2 rounded-xl hover:bg-error/10">
                   <span className="material-symbols-outlined" aria-hidden="true">logout</span>
                   Sign Out
@@ -64,12 +80,15 @@ export default async function RiderDashboard() {
               <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
                 {activeRuns.map((run: any) => (
                   <div key={run.id} className="bg-surface-container-lowest p-6 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-on-surface">{run.route.name}</h3>
                       <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                         {run.status}
                       </div>
                     </div>
+                    {run.route.description && (
+                      <p className="text-sm font-semibold text-error mb-4">{run.route.description}</p>
+                    )}
                     
                     <div className="space-y-2 mb-6 flex-1">
                       <p className="text-on-surface-variant text-sm flex items-center gap-2">
@@ -83,7 +102,11 @@ export default async function RiderDashboard() {
                     </div>
 
                     <div className="mt-auto border-t border-outline-variant/20 pt-4">
-                      {run.status === 'scheduled' && (
+                      {run.status === 'scheduled' && run.driver_id === dbUser.id ? (
+                        <div className="bg-primary/10 text-primary p-4 rounded-xl text-center font-bold text-sm">
+                          You are driving this route.
+                        </div>
+                      ) : run.status === 'scheduled' && (
                         <form action={createBooking} className="space-y-4">
                           <input type="hidden" name="run_id" value={run.id} />
                           

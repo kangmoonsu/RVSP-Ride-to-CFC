@@ -12,7 +12,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
           <Link href="/login" className="text-[#3f4945] dark:text-[#afcbd8] hover:bg-[#eeeeed] dark:hover:bg-[#3f4945] p-2 rounded-full transition-colors duration-300">
             <span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>
           </Link>
-          <span className="font-headline text-xl font-bold text-[#00342b] dark:text-[#ffffff]">The Sanctuary</span>
+          <span className="font-headline text-xl font-bold text-[#00342b] dark:text-[#ffffff]">CFC</span>
         </div>
       </header>
 
@@ -34,7 +34,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
           <div className="lg:col-span-7 flex flex-col items-center lg:items-start space-y-12">
             <header className="text-center lg:text-left space-y-4">
               <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-primary leading-tight font-headline">
-                Join the Sanctuary
+                Join CFC
               </h1>
               <p className="text-on-surface-variant text-lg max-w-md">
                 Enter your details to start your journey. A supportive community and peaceful ride await you.
