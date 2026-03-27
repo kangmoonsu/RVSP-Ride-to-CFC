@@ -6,6 +6,7 @@ import { approveBooking } from '@/app/actions/bookings';
 import { signOut } from '@/app/actions/auth';
 import Link from 'next/link';
 import LiveDriverBroadcaster from '@/components/Map/LiveDriverBroadcaster';
+import BottomNav from '@/components/layout/BottomNav';
 
 export default async function DriverDashboard() {
   const supabase = await createClient();
@@ -21,8 +22,7 @@ export default async function DriverDashboard() {
     redirect('/dashboard');
   }
 
-  // Fetch runs assigned to this driver
-  const { data: assignedRuns, error: runsError } = await supabase
+  const { data: assignedRuns } = await supabase
     .from('route_runs')
     .select(`
       *,
@@ -39,202 +39,247 @@ export default async function DriverDashboard() {
     .order('created_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col pt-24 pb-12 px-6">
-      <div className="max-w-4xl mx-auto w-full space-y-8">
-        {/* Header Section */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-outline-variant/20">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight font-headline">Driver Dashboard</h1>
-            <p className="text-on-surface-variant text-lg mt-2 font-medium">Safe travels, {dbUser.full_name}!</p>
-          </div>
-          <div className="flex items-center gap-4">
-             <Link href="/" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 font-bold px-4 py-2 rounded-xl hover:bg-primary/10">
-               <span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>
-               Back
-             </Link>
-             <Link href="/rider/dashboard" className="bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center gap-2 font-bold px-4 py-2 rounded-xl shadow-sm">
-               <span className="material-symbols-outlined" aria-hidden="true">person_raised_hand</span>
-               Switch to Rider
-             </Link>
-             <form action={signOut}>
-                <button type="submit" className="text-on-surface-variant hover:text-error transition-colors flex items-center gap-2 font-bold px-4 py-2 rounded-xl hover:bg-error/10">
-                  <span className="material-symbols-outlined" aria-hidden="true">logout</span>
-                  Sign Out
-                </button>
-             </form>
-          </div>
-        </header>
+    <div className="min-h-screen bg-surface flex flex-col">
+      {/* Mobile sticky header */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 flex items-center h-14 px-4 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/10"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        {/* Left */}
+        <Link
+          href="/"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors"
+          aria-label="Back to home"
+        >
+          <span className="material-symbols-outlined text-on-surface-variant text-[22px]" aria-hidden="true">home</span>
+        </Link>
 
-        {/* Assigned Runs */}
-        <section>
-          <div className="flex justify-between items-center mb-6 mt-8">
-            <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined text-secondary" aria-hidden="true">local_taxi</span>
+        {/* Center */}
+        <div className="flex-1 text-center">
+          <span className="text-base font-bold text-on-surface">Driver Dashboard</span>
+        </div>
+
+        {/* Right: sign out */}
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error/10 transition-colors"
+            aria-label="Sign out"
+          >
+            <span className="material-symbols-outlined text-on-surface-variant text-[22px]" aria-hidden="true">logout</span>
+          </button>
+        </form>
+      </header>
+
+      {/* Page content */}
+      <div
+        className="flex-1 pt-14 px-4 max-w-2xl mx-auto w-full"
+        style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
+      >
+
+        {/* Greeting */}
+        <div className="mt-5 mb-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Safe travels</p>
+          <h2 className="text-2xl font-extrabold text-primary font-headline">{dbUser.full_name} 🚐</h2>
+        </div>
+
+        {/* Switch to rider pill */}
+        <div className="flex mb-6">
+          <Link
+            href="/rider/dashboard"
+            className="inline-flex items-center gap-2 bg-surface-container text-on-surface-variant font-semibold text-xs px-4 py-2 rounded-full border border-outline-variant/20 hover:border-primary/30 hover:text-primary transition-all"
+          >
+            <span className="material-symbols-outlined text-[16px]" aria-hidden="true">person_raised_hand</span>
+            Switch to Rider View
+          </Link>
+        </div>
+
+        {/* ── Assigned Runs ── */}
+        <section className="mb-8" id="assigned-runs">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
+              <span className="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">local_taxi</span>
               My Assigned Runs
             </h2>
-            <Link href="/driver/routes/new" className="bg-primary-container text-on-primary-container font-bold px-4 py-2 rounded-xl shadow-sm hover:bg-primary/20 transition-all flex items-center gap-2 text-sm">
-               <span className="material-symbols-outlined text-[18px]">add</span>
-               Create Route
+            <Link
+              href="/driver/routes/new"
+              id="create-route-btn"
+              className="btn-active inline-flex items-center gap-1 bg-primary text-on-primary font-bold text-xs px-3 py-2 rounded-full shadow-sm"
+            >
+              <span className="material-symbols-outlined text-[16px]" aria-hidden="true">add</span>
+              New Route
             </Link>
           </div>
 
           {!assignedRuns || assignedRuns.length === 0 ? (
-             <div className="bg-surface-container-lowest p-12 rounded-4xl border border-outline-variant/10 text-center shadow-sm">
-               <span className="material-symbols-outlined text-outline text-6xl mb-4 block" aria-hidden="true">assignment_turned_in</span>
-               <h3 className="text-xl font-bold text-on-surface mb-2">No Assigned Runs</h3>
-               <p className="text-on-surface-variant max-w-sm mx-auto">You do not have any upcoming routes assigned to you. The coordinator will assign runs.</p>
-             </div>
+            <div className="bg-surface-container-lowest p-10 rounded-3xl border border-outline-variant/10 text-center shadow-sm">
+              <span className="material-symbols-outlined text-outline text-5xl mb-3 block" aria-hidden="true">assignment_turned_in</span>
+              <h3 className="text-base font-bold text-on-surface mb-1">No Assigned Runs</h3>
+              <p className="text-on-surface-variant text-sm max-w-xs mx-auto">The coordinator will assign runs to you.</p>
+            </div>
           ) : (
-             <div className="space-y-6">
-               {assignedRuns.map((run: any) => {
-                 // Sort stops by order
-                 const stops = run.route?.route_stops?.sort((a: any, b: any) => a.stop_order - b.stop_order) || [];
-                 const passengers = run.ride_bookings || [];
-                 const isActionable = run.status === 'scheduled' || run.status === 'in-progress';
+            <div className="space-y-4">
+              {assignedRuns.map((run: any) => {
+                const stops = run.route?.route_stops?.sort((a: any, b: any) => a.stop_order - b.stop_order) || [];
+                const passengers = run.ride_bookings || [];
+                const isActionable = run.status === 'scheduled' || run.status === 'in-progress';
 
-                 return (
-                   <div key={run.id} className="bg-surface-container-lowest p-6 rounded-4xl border border-outline-variant/10 shadow-sm flex flex-col gap-6">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-2xl font-bold text-on-surface">{run.route?.name}</h3>
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${run.status === 'in-progress' ? 'bg-secondary-container text-on-secondary-container' : 'bg-primary/10 text-primary'}`}>
-                              {run.status}
-                            </span>
-                          </div>
-                          <p className="text-on-surface-variant text-sm flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[18px] opacity-70" aria-hidden="true">calendar_clock</span>
+                return (
+                  <div key={run.id} className="bg-surface-container-lowest rounded-3xl border border-outline-variant/10 shadow-sm overflow-hidden">
+                    {/* Run meta */}
+                    <div className="p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1 mr-3">
+                          <h3 className="text-base font-bold text-on-surface">{run.route?.name}</h3>
+                          <p className="text-on-surface-variant text-xs flex items-center gap-1 mt-1">
+                            <span className="material-symbols-outlined text-[14px]" aria-hidden="true">calendar_clock</span>
                             {new Date(run.scheduled_date).toLocaleString()}
                           </p>
                         </div>
-                        {isActionable && (
-                          <form action={updateRunStatus.bind(null, run.id, run.status === 'scheduled' ? 'in-progress' : 'completed')}>
-                            <button className={`text-on-primary font-bold py-3 px-6 rounded-full shadow-md transition-all flex items-center gap-2 ${run.status === 'scheduled' ? 'bg-primary hover:bg-primary-container shadow-primary/10' : 'bg-secondary hover:bg-secondary-container shadow-secondary/10'}`}>
-                              <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
-                                {run.status === 'scheduled' ? 'play_arrow' : 'stop'}
-                              </span>
-                              {run.status === 'scheduled' ? 'Start Run' : 'Complete Run'}
-                            </button>
-                          </form>
-                        )}
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${run.status === 'in-progress' ? 'bg-secondary-container text-on-secondary-container' : 'bg-primary/10 text-primary'}`}>
+                          {run.status}
+                        </span>
                       </div>
 
-                      {run.status === 'in-progress' && (
-                        <div className="mt-2">
-                          <LiveDriverBroadcaster runId={run.id} />
-                        </div>
+                      {/* Start / Complete button */}
+                      {isActionable && (
+                        <form action={updateRunStatus.bind(null, run.id, run.status === 'scheduled' ? 'in-progress' : 'completed')}>
+                          <button
+                            className={`btn-active w-full h-12 font-bold rounded-2xl shadow-sm text-sm flex items-center justify-center gap-2 text-on-primary ${run.status === 'scheduled' ? 'bg-primary' : 'bg-secondary'}`}
+                          >
+                            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+                              {run.status === 'scheduled' ? 'play_arrow' : 'stop'}
+                            </span>
+                            {run.status === 'scheduled' ? 'Start Run' : 'Complete Run'}
+                          </button>
+                        </form>
                       )}
+                    </div>
 
-                      {/* Stops & Passengers */}
-                      <div className="bg-surface-container-low rounded-2xl p-4 border border-outline-variant/10">
-                        <h4 className="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-4">Route Stops & Passengers</h4>
-                        <div className="space-y-4">
-                          {stops.map((stop: any, index: number) => {
-                             const pickups = passengers.filter((p: any) => p.pickup_stop_id === stop.id);
-                             return (
-                               <div key={stop.id} className="flex items-start gap-4">
-                                 <div className="flex flex-col items-center">
-                                   <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm shrink-0">
-                                     {stop.stop_order}
-                                   </div>
-                                   {index < stops.length - 1 && (
-                                     <div className="w-0.5 h-full min-h-8 bg-outline-variant/30 my-1"></div>
-                                   )}
-                                 </div>
-                                 <div className="flex-1 pb-4">
-                                    <h5 className="font-bold text-on-surface">{stop.location_name}</h5>
-                                    {pickups.length > 0 ? (
-                                      <ul className="mt-2 space-y-2">
-                                        {pickups.map((p: any) => (
-                                          <li key={p.id} className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20 flex flex-col gap-2 text-sm">
-                                            <div className="flex justify-between items-center w-full">
-                                              <div className="flex items-center gap-2">
-                                                <span className="material-symbols-outlined text-secondary opacity-70 text-[18px]" aria-hidden="true">person_raised_hand</span>
-                                                <span className="font-semibold">{p.rider?.full_name}</span>
-                                                {p.status === 'confirmed' ? (
-                                                  <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded uppercase">Approved</span>
-                                                ) : (
-                                                  <span className="text-[10px] font-bold bg-error/10 text-error px-2 py-0.5 rounded uppercase">Pending</span>
-                                                )}
-                                              </div>
-                                              <div className="flex items-center gap-2">
-                                                {p.needs_return_ride && (
-                                                  <span className="text-xs font-bold bg-secondary/10 text-secondary px-2 py-1 rounded">Return</span>
-                                                )}
-                                                {p.status === 'pending' && (
-                                                  <form action={approveBooking.bind(null, p.id)}>
-                                                    <button type="submit" className="bg-primary text-on-primary px-3 py-1 rounded-lg text-xs font-bold shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors">
-                                                      Approve
-                                                    </button>
-                                                  </form>
-                                                )}
-                                              </div>
-                                            </div>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    ) : (
-                                      <p className="text-xs text-on-surface-variant/70 italic mt-1">No pickups at this stop.</p>
-                                    )}
-                                 </div>
-                               </div>
-                             );
-                          })}
-                        </div>
+                    {/* Live broadcaster */}
+                    {run.status === 'in-progress' && (
+                      <div className="px-4 pb-3">
+                        <LiveDriverBroadcaster runId={run.id} />
                       </div>
+                    )}
 
-                   </div>
-                 );
-               })}
-             </div>
+                    {/* Stops & Passengers */}
+                    <div className="bg-surface-container-low rounded-b-3xl p-4 border-t border-outline-variant/10">
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">Stops & Passengers</h4>
+                      <div className="space-y-4">
+                        {stops.map((stop: any, index: number) => {
+                          const pickups = passengers.filter((p: any) => p.pickup_stop_id === stop.id);
+                          return (
+                            <div key={stop.id} className="flex items-start gap-3">
+                              <div className="flex flex-col items-center">
+                                <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs shrink-0">
+                                  {stop.stop_order}
+                                </div>
+                                {index < stops.length - 1 && (
+                                  <div className="w-0.5 flex-1 min-h-6 bg-outline-variant/30 my-1" />
+                                )}
+                              </div>
+                              <div className="flex-1 pb-2">
+                                <h5 className="font-bold text-on-surface text-sm">{stop.location_name}</h5>
+                                {pickups.length > 0 ? (
+                                  <ul className="mt-2 space-y-2">
+                                    {pickups.map((p: any) => (
+                                      <li key={p.id} className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20">
+                                        <div className="flex justify-between items-center">
+                                          <div className="flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">person_raised_hand</span>
+                                            <span className="font-semibold text-sm">{p.rider?.full_name}</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            {p.needs_return_ride && (
+                                              <span className="text-[10px] font-bold bg-secondary/10 text-secondary px-2 py-0.5 rounded-full">Return</span>
+                                            )}
+                                            {p.status === 'confirmed' ? (
+                                              <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">Approved</span>
+                                            ) : (
+                                              <form action={approveBooking.bind(null, p.id)}>
+                                                <button
+                                                  type="submit"
+                                                  className="btn-active bg-primary text-on-primary px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm"
+                                                >
+                                                  Approve
+                                                </button>
+                                              </form>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <p className="text-xs text-on-surface-variant/60 italic mt-1">No pickups at this stop.</p>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </section>
 
-        {/* My Managed Routes */}
-        <section className="pt-8 border-t border-outline-variant/20">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined text-secondary" aria-hidden="true">settings_input_component</span>
-              My Managed Routes
+        {/* ── My Managed Routes ── */}
+        <section id="routes">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
+              <span className="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">settings_input_component</span>
+              My Routes
             </h2>
           </div>
 
           {!myRoutes || myRoutes.length === 0 ? (
-             <div className="bg-surface-container-lowest p-8 rounded-4xl border border-outline-variant/10 text-center shadow-sm">
-               <p className="text-on-surface-variant max-w-sm mx-auto">You haven't created any routes yet.</p>
-             </div>
+            <div className="bg-surface-container-lowest p-8 rounded-3xl border border-outline-variant/10 text-center shadow-sm">
+              <p className="text-on-surface-variant text-sm">No routes yet. Tap "New Route" to create one.</p>
+            </div>
           ) : (
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               {myRoutes.map((route: any) => (
-                 <div key={route.id} className="bg-surface-container-lowest p-6 rounded-4xl border border-outline-variant/10 shadow-sm flex flex-col gap-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-on-surface mb-1">{route.name}</h3>
-                      <p className="text-on-surface-variant text-sm flex items-center gap-2 mb-1">
-                        <span className="material-symbols-outlined text-[16px] opacity-70" aria-hidden="true">event_repeat</span>
-                        Every {route.schedule_day} at {route.schedule_time}
-                      </p>
-                      <p className="text-on-surface-variant text-sm flex items-center gap-2 mb-3">
-                        <span className="material-symbols-outlined text-[16px] opacity-70" aria-hidden="true">airline_seat_recline_normal</span>
-                        Capacity: {route.capacity || 4} seats
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3 mt-auto">
-                      <Link href={`/driver/routes/${route.id}/edit`} className="flex-1 bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-bold px-4 py-2 rounded-xl text-center shadow-sm text-sm border border-outline-variant/20">
-                        Edit Route
-                      </Link>
-                      <form action={deleteRoute.bind(null, route.id)} className="flex-1">
-                        <button type="submit" className="w-full bg-error/10 text-error hover:bg-error hover:text-on-error transition-colors font-bold px-4 py-2 rounded-xl text-center shadow-sm text-sm">
-                          Delete
-                        </button>
-                      </form>
-                    </div>
-                 </div>
-               ))}
-             </div>
+            <div className="space-y-3">
+              {myRoutes.map((route: any) => (
+                <div key={route.id} className="bg-surface-container-lowest p-4 rounded-3xl border border-outline-variant/10 shadow-sm">
+                  <h3 className="text-base font-bold text-on-surface mb-1">{route.name}</h3>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-on-surface-variant mb-4">
+                    <span className="flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]" aria-hidden="true">event_repeat</span>
+                      Every {route.schedule_day} at {route.schedule_time}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]" aria-hidden="true">airline_seat_recline_normal</span>
+                      {route.capacity || 4} seats
+                    </span>
+                  </div>
+                  <div className="flex gap-3">
+                    <Link
+                      href={`/driver/routes/${route.id}/edit`}
+                      className="btn-active flex-1 h-11 bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-bold rounded-2xl text-center text-sm flex items-center justify-center border border-outline-variant/20"
+                    >
+                      Edit Route
+                    </Link>
+                    <form action={deleteRoute.bind(null, route.id)} className="flex-1">
+                      <button
+                        type="submit"
+                        className="btn-active w-full h-11 bg-error/10 text-error hover:bg-error hover:text-on-error transition-colors font-bold rounded-2xl text-sm"
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </section>
       </div>
+
+      {/* Bottom navigation */}
+      <BottomNav role="driver" />
     </div>
   );
 }

@@ -6,76 +6,82 @@ export default async function ForgotPasswordPage({ searchParams }: { searchParam
   const { error, message } = await searchParams;
 
   return (
-    <>
-      <header className="fixed top-0 left-0 w-full z-50 flex items-center px-6 h-16 bg-[#f9f9f8] dark:bg-[#1a1c1c] no-border tonal-shift-bg ease-in-out transition-all duration-300">
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="hover:bg-[#f4f4f3] dark:hover:bg-[#2a2c2c] transition-colors duration-300 p-2 rounded-full flex items-center justify-center">
-            <span className="material-symbols-outlined text-[#00342b] dark:text-[#afcbd8]" aria-hidden="true">arrow_back</span>
-          </Link>
-        </div>
-        <div className="ml-4">
-          <span className="font-headline text-sm font-medium tracking-tight text-[#3f4945] dark:text-[#bfc9c4]">Back to Sign in</span>
-        </div>
-      </header>
-      
-      <main className="flex-grow flex flex-col items-center justify-center px-6 pt-16 pb-12">
-        <div className="w-full max-w-md space-y-12">
-          {/* Hero Content */}
-          <div className="space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-surface-container-low rounded-xl mb-6">
-              <span className="material-symbols-outlined text-primary text-3xl" aria-hidden="true">lock_reset</span>
-            </div>
-            <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
-              Reset Password
-            </h1>
-            <p className="text-on-surface-variant text-base mt-2">Enter the email associated with your account, and we&apos;ll send you instructions to reset your password.</p>
-          </div>
-          
-          {/* Form Alerts */}
-          {(error || message) && (
-            <div className={`p-4 rounded-xl text-sm font-medium ${error ? 'bg-error-container text-error' : 'bg-primary-container text-primary'}`}>
-              {error || message}
-            </div>
-          )}
+    <div className="min-h-screen bg-surface flex flex-col relative overflow-hidden">
+      {/* Decorative blob */}
+      <div className="absolute -top-24 -right-16 w-72 h-72 bg-primary/8 rounded-full blur-[80px] pointer-events-none" aria-hidden="true" />
 
-          {/* Form Section */}
-          <form action={forgotPassword} className="space-y-10">
-            <div className="space-y-6">
-              <div className="relative group">
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-secondary mb-2" htmlFor="email">
-                  Email Address
-                </label>
-                <input className="w-full bg-transparent border-none border-b-2 border-surface-container-highest focus:border-primary outline-none focus:ring-0 px-0 py-3 font-body text-base placeholder:text-outline-variant transition-colors duration-300" id="email" name="email" placeholder="name@example.com" type="email" required />
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-6">
-              <button className="w-full bg-primary text-on-primary font-semibold py-4 px-8 rounded-full shadow-lg shadow-primary/10 hover:bg-primary-container transition-all duration-300 active:scale-95" type="submit">
-                Send Reset Link
-              </button>
-              <Link href="/login" className="group flex items-center justify-center gap-2 py-2">
-                <span className="text-sm font-semibold text-primary group-hover:underline">Back to Sign in</span>
-              </Link>
-            </div>
-          </form>
-          
-          {/* Editorial Accent Section */}
-          <div className="pt-12 grid grid-cols-12 gap-4">
-            <div className="col-span-8 h-1 bg-surface-container rounded-full overflow-hidden">
-              <div className="h-full bg-primary-container w-1/3"></div>
-            </div>
-            <div className="col-span-4 h-1 bg-surface-container-low rounded-full"></div>
+      {/* Header */}
+      <div
+        className="flex items-center px-4 h-14"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        <Link
+          href="/login"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors"
+          aria-label="Back to login"
+        >
+          <span className="material-symbols-outlined text-on-surface-variant text-[22px]" aria-hidden="true">arrow_back</span>
+        </Link>
+        <span className="ml-3 text-sm font-semibold text-on-surface-variant">Back to Sign in</span>
+      </div>
+
+      <main className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-md w-full mx-auto">
+        {/* Icon + heading */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-surface-container mb-5">
+            <span className="material-symbols-outlined text-primary text-[40px]" aria-hidden="true">lock_reset</span>
           </div>
-          
-          <div className="relative overflow-hidden rounded-xl h-48 w-full group">
-            <div className="absolute inset-0 bg-primary/20 z-10 group-hover:bg-primary/10 transition-colors duration-500"></div>
-            <img className="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 transition-transform duration-700" alt="church sanctuary window" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHOIm7tMjcnXF0XSvb3YfmVevabQkCFeNqrqFoYwznL5tVAZWutTGoiH9N5Gwd5LL5LbaX3BLPtbZvqJUMy6F1VRUnoxzdaoGaiGn7SrSxR_tTj_cZsXexatRFv0I_k8K6OL_3QRMAtihb2iS8uy9B6zqw5nVx7hgF8KF8NqhGP3VJA58i2jiZFcY3k8jqVq3UIv3htOdwkOgjactmJi3BWlhHlz5qmpFov6mSC5H03fBxkM6PwRSSPOrFCeNiF5xu4zPgt0rqTJ0"/>
-            <div className="absolute bottom-4 left-6 z-20">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">Sanctuary Modern</span>
-            </div>
-          </div>
+          <h1 className="text-3xl font-extrabold text-on-surface tracking-tight font-headline mb-3">Reset Password</h1>
+          <p className="text-on-surface-variant text-sm leading-relaxed max-w-xs mx-auto">
+            Enter the email associated with your account and we&apos;ll send reset instructions.
+          </p>
         </div>
+
+        {/* Alerts */}
+        {(error || message) && (
+          <div className={`mb-6 p-4 rounded-2xl text-sm font-medium ${error ? 'bg-error-container text-on-error-container' : 'bg-primary-container text-on-primary-container'}`}>
+            {error || message}
+          </div>
+        )}
+
+        {/* Form */}
+        <form action={forgotPassword} className="space-y-5" id="forgot-password-form">
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2" htmlFor="email">
+              Email Address
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[20px]" aria-hidden="true">mail</span>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="name@example.com"
+                required
+                autoComplete="email"
+                className="w-full h-14 pl-12 pr-4 bg-surface-container rounded-2xl text-on-surface placeholder:text-outline text-sm outline-none focus:ring-2 focus:ring-primary/40 border border-outline-variant/20 focus:border-primary transition-all"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            id="send-reset-btn"
+            className="btn-active w-full h-14 bg-primary text-on-primary font-bold rounded-full shadow-lg shadow-primary/20 flex items-center justify-center gap-2 text-base"
+          >
+            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">send</span>
+            Send Reset Link
+          </button>
+        </form>
+
+        <Link
+          href="/login"
+          className="mt-6 flex items-center justify-center gap-1 text-sm font-semibold text-primary hover:underline underline-offset-2"
+        >
+          <span className="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_back</span>
+          Back to Sign in
+        </Link>
       </main>
-    </>
+    </div>
   )
 }

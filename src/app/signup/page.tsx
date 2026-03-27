@@ -6,90 +6,130 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
   const { error, message } = await searchParams;
 
   return (
-    <>
-      <header className="fixed top-0 w-full z-50 bg-[#f9f9f8]/80 dark:bg-[#1a1c1c]/80 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,52,43,0.06)] flex justify-between items-center px-6 py-4">
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="text-[#3f4945] dark:text-[#afcbd8] hover:bg-[#eeeeed] dark:hover:bg-[#3f4945] p-2 rounded-full transition-colors duration-300">
-            <span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+    <div className="min-h-screen bg-surface flex flex-col relative overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute -top-24 -right-16 w-72 h-72 bg-secondary/8 rounded-full blur-[80px] pointer-events-none" aria-hidden="true" />
+      <div className="absolute bottom-0 -left-20 w-64 h-64 bg-primary/8 rounded-full blur-[80px] pointer-events-none" aria-hidden="true" />
+
+      {/* Header */}
+      <div
+        className="flex items-center px-4 h-14"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        <Link
+          href="/login"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors"
+          aria-label="Back to login"
+        >
+          <span className="material-symbols-outlined text-on-surface-variant text-[22px]" aria-hidden="true">arrow_back</span>
+        </Link>
+        <span className="ml-2 text-base font-bold text-primary font-headline">CFC</span>
+      </div>
+
+      <main className="flex-1 flex flex-col justify-center px-6 pb-8 max-w-md w-full mx-auto">
+        {/* Welcome */}
+        <div className="mb-8 mt-2 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-secondary-container mb-4">
+            <span className="material-symbols-outlined text-on-secondary-container text-[32px]" aria-hidden="true">church</span>
+          </div>
+          <h1 className="text-3xl font-extrabold text-on-surface tracking-tight font-headline mb-2">Join CFC</h1>
+          <p className="text-on-surface-variant text-sm">A supportive community and peaceful ride await you.</p>
+        </div>
+
+        {/* Alerts */}
+        {(error || message) && (
+          <div className={`mb-6 p-4 rounded-2xl text-sm font-medium ${error ? 'bg-error-container text-on-error-container' : 'bg-primary-container text-on-primary-container'}`}>
+            {error || message}
+          </div>
+        )}
+
+        {/* Form */}
+        <form action={signup} className="space-y-5" id="signup-form">
+          {/* Full Name */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2" htmlFor="full_name">
+              Full Name
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[20px]" aria-hidden="true">person</span>
+              <input
+                id="full_name"
+                name="full_name"
+                type="text"
+                placeholder="Sarah Jenkins"
+                required
+                autoComplete="name"
+                className="w-full h-14 pl-12 pr-4 bg-surface-container rounded-2xl text-on-surface placeholder:text-outline text-sm outline-none focus:ring-2 focus:ring-primary/40 border border-outline-variant/20 focus:border-primary transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2" htmlFor="email">
+              Email Address
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[20px]" aria-hidden="true">mail</span>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="sarah@example.com"
+                required
+                autoComplete="email"
+                className="w-full h-14 pl-12 pr-4 bg-surface-container rounded-2xl text-on-surface placeholder:text-outline text-sm outline-none focus:ring-2 focus:ring-primary/40 border border-outline-variant/20 focus:border-primary transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2" htmlFor="password">
+              Password
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[20px]" aria-hidden="true">lock</span>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                autoComplete="new-password"
+                className="w-full h-14 pl-12 pr-4 bg-surface-container rounded-2xl text-on-surface placeholder:text-outline text-sm outline-none focus:ring-2 focus:ring-primary/40 border border-outline-variant/20 focus:border-primary transition-all"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            id="create-account-btn"
+            className="btn-active w-full h-14 bg-primary text-on-primary font-bold rounded-full shadow-lg shadow-primary/20 flex items-center justify-center gap-2 text-base mt-2"
+          >
+            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">how_to_reg</span>
+            Create Account
+          </button>
+        </form>
+
+        {/* Privacy note */}
+        <div className="mt-6 bg-surface-container-low rounded-2xl p-4 flex gap-3 items-start">
+          <span className="material-symbols-outlined text-secondary text-[20px] mt-0.5 shrink-0" aria-hidden="true">shield</span>
+          <p className="text-xs text-on-surface-variant leading-relaxed">
+            By joining, you agree to our{' '}
+            <span className="text-primary font-semibold">Terms of Service</span> and{' '}
+            <span className="text-primary font-semibold">Community Guidelines</span>. We value your privacy.
+          </p>
+        </div>
+
+        {/* Sign in link */}
+        <p className="text-center text-sm text-on-surface-variant mt-6">
+          Already have an account?{' '}
+          <Link href="/login" className="text-primary font-bold hover:underline underline-offset-2">
+            Sign in
           </Link>
-          <span className="font-headline text-xl font-bold text-[#00342b] dark:text-[#ffffff]">CFC</span>
-        </div>
-      </header>
-
-      <main className="min-h-screen pt-24 pb-32 flex items-center justify-center px-6">
-        <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Asymmetric Visual Side */}
-          <div className="hidden lg:block lg:col-span-5 relative">
-            <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
-              <img className="w-full h-full object-cover" alt="Peaceful interior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG77DVkGm_eL-9TzgT5dT25YL2_wfcvN1u8yPRjBiqCh9Btik397GZTM2kM6VUsvxxDYVFTG2PaAft-mAG40jz-R-RBrlmFyOjGIx587RwSJ2PRPM2S3y87CN2UZQ7WCJ4iLos86RfeqLWjESrquv02mppLJmizpQ_e-oD1CFB7xWpqJxobUeGjyPAfgIBgGasRafkT_t-BEmlkRKrZtf-KPj3tXVUOsEwEwsrsB57mxzSgtaEI4jjD4-ktRWoQNT9LI3QopM7C5c"/>
-            </div>
-            <div className="absolute -bottom-6 -right-6 bg-secondary-container p-8 rounded-xl shadow-lg max-w-[240px]">
-              <p className="text-on-secondary-container font-medium leading-relaxed italic">
-                &quot;Where two or three gather in my name, there am I with them.&quot;
-              </p>
-            </div>
-          </div>
-
-          {/* Form Side */}
-          <div className="lg:col-span-7 flex flex-col items-center lg:items-start space-y-12">
-            <header className="text-center lg:text-left space-y-4">
-              <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-primary leading-tight font-headline">
-                Join CFC
-              </h1>
-              <p className="text-on-surface-variant text-lg max-w-md">
-                Enter your details to start your journey. A supportive community and peaceful ride await you.
-              </p>
-            </header>
-
-            {/* Form Alerts */}
-            {(error || message) && (
-              <div className={`p-4 w-full max-w-md rounded-xl text-sm font-medium ${error ? 'bg-error-container text-error' : 'bg-primary-container text-primary'}`}>
-                {error || message}
-              </div>
-            )}
-
-            <form action={signup} className="w-full max-w-md space-y-8">
-              <div className="space-y-6">
-                <div className="group relative">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Full Name</label>
-                  <input className="w-full bg-transparent border-0 border-b-2 border-surface-container-highest py-3 px-0 focus:ring-0 focus:border-primary transition-colors duration-300 placeholder:text-outline-variant/60 outline-none" name="full_name" placeholder="Sarah Jenkins" type="text" required />
-                </div>
-                <div className="group relative">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Email Address</label>
-                  <input className="w-full bg-transparent border-0 border-b-2 border-surface-container-highest py-3 px-0 focus:ring-0 focus:border-primary transition-colors duration-300 placeholder:text-outline-variant/60 outline-none" name="email" placeholder="sarah@example.com" type="email" required />
-                </div>
-                <div className="group relative">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Password</label>
-                  <input className="w-full bg-transparent border-0 border-b-2 border-surface-container-highest py-3 px-0 focus:ring-0 focus:border-primary transition-colors duration-300 placeholder:text-outline-variant/60 outline-none" name="password" placeholder="••••••••" type="password" required />
-                </div>
-              </div>
-
-              <div className="pt-4 flex flex-col items-center lg:items-start gap-6">
-                <button className="w-full py-4 px-8 bg-primary text-on-primary rounded-full font-semibold text-lg hover:bg-primary-container transition-all duration-300 shadow-lg shadow-primary/10" type="submit">
-                  Create Account
-                </button>
-                <div className="flex items-center gap-4 py-2">
-                  <div className="h-px w-8 bg-outline-variant/30"></div>
-                  <span className="text-sm text-on-surface-variant">Already have an account?</span>
-                  <div className="h-px w-8 bg-outline-variant/30"></div>
-                </div>
-                <Link href="/login" className="text-primary font-bold text-sm hover:underline transition-all">
-                  Sign in to your account
-                </Link>
-              </div>
-            </form>
-
-            <div className="bg-surface-container-low p-6 rounded-xl w-full max-w-md">
-              <div className="flex gap-4 items-start">
-                <span className="material-symbols-outlined text-secondary" aria-hidden="true">shield</span>
-                <p className="text-xs leading-relaxed text-on-surface-variant">
-                  By joining, you agree to our <span className="text-primary font-semibold">Terms of Service</span> and <span className="text-primary font-semibold">Community Guidelines</span>. We value your privacy and data security.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </p>
       </main>
-    </>
+    </div>
   )
 }

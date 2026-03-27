@@ -61,6 +61,22 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     @apply font-body min-h-screen flex flex-col antialiased;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Tap highlight removal for app-like feel */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Better input appearance on iOS */
+  input, select, textarea, button {
+    -webkit-appearance: none;
+    appearance: none;
   }
 }
 
@@ -70,4 +86,27 @@
 .glass-effect {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* Mobile page shell — use on pages with bottom nav */
+.page-with-bottom-nav {
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* iOS safe area top inset for fixed headers */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Bottom nav safe area */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Smooth active scale for buttons */
+.btn-active {
+  transition: transform 150ms ease;
+}
+.btn-active:active {
+  transform: scale(0.97);
 }
