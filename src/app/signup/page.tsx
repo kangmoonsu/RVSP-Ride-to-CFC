@@ -56,7 +56,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
                 id="full_name"
                 name="full_name"
                 type="text"
-                placeholder="Sarah Jenkins"
+                placeholder="Honggildong"
                 required
                 autoComplete="name"
                 className="w-full h-14 pl-12 pr-4 bg-surface-container rounded-2xl text-on-surface placeholder:text-outline text-sm outline-none focus:ring-2 focus:ring-primary/40 border border-outline-variant/20 focus:border-primary transition-all"
@@ -75,7 +75,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
                 id="email"
                 name="email"
                 type="email"
-                placeholder="sarah@example.com"
+                placeholder="honggildong@example.com"
                 required
                 autoComplete="email"
                 className="w-full h-14 pl-12 pr-4 bg-surface-container rounded-2xl text-on-surface placeholder:text-outline text-sm outline-none focus:ring-2 focus:ring-primary/40 border border-outline-variant/20 focus:border-primary transition-all"

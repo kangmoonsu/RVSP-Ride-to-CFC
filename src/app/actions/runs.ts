@@ -60,3 +60,38 @@ export async function getActiveRuns() {
 
   return data
 }
+
+export async function checkOffStop(runId: string, stopId: string) {
+  const supabase = await createClient()
+
+  const { data: run, error: fetchError } = await supabase.from('route_runs').select('completed_stop_ids').eq('id', runId).single()
+  
+  if (fetchError) {
+    console.error('Error fetching run:', fetchError)
+    throw new Error(fetchError.message)
+  }
+
+  const currentStops = run.completed_stop_ids || []
+  if (!currentStops.includes(stopId)) {
+    const { error } = await supabase.from('route_runs').update({
+      completed_stop_ids: [...currentStops, stopId]
+    }).eq('id', runId)
+    
+    if (error) {
+      console.error('Error updating stops:', error)
+      throw new Error(error.message)
+    }
+  }
+
+  revalidatePath('/driver/dashboard')
+  revalidatePath('/rider/dashboard')
+}
+
+export async function updateRunLocation(runId: string, lat: number, lng: number) {
+  const supabase = await createClient()
+  await supabase.from('route_runs').update({
+    current_lat: lat,
+    current_lng: lng,
+    location_updated_at: new Date().toISOString()
+  }).eq('id', runId)
+}

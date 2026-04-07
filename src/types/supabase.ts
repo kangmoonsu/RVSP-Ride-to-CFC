@@ -68,25 +68,37 @@ export type Database = {
       }
       route_runs: {
         Row: {
+          completed_stop_ids: string[] | null
           created_at: string
+          current_lat: number | null
+          current_lng: number | null
           driver_id: string | null
           id: string
+          location_updated_at: string | null
           route_id: string
           scheduled_date: string
           status: Database["public"]["Enums"]["run_status"]
         }
         Insert: {
+          completed_stop_ids?: string[] | null
           created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
           driver_id?: string | null
           id?: string
+          location_updated_at?: string | null
           route_id: string
           scheduled_date: string
           status?: Database["public"]["Enums"]["run_status"]
         }
         Update: {
+          completed_stop_ids?: string[] | null
           created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
           driver_id?: string | null
           id?: string
+          location_updated_at?: string | null
           route_id?: string
           scheduled_date?: string
           status?: Database["public"]["Enums"]["run_status"]

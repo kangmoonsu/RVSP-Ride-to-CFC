@@ -23,15 +23,28 @@ export default function LiveDriverBroadcaster({ runId }: { runId: string }) {
       }
     });
 
+    let lastDbUpdate = 0;
+
     const watchId = navigator.geolocation.watchPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude, heading, speed } = position.coords;
+        const now = Date.now();
         if (isBroadcasting) {
           channel.send({
             type: 'broadcast',
             event: 'location_update',
-            payload: { lat: latitude, lng: longitude, heading, speed, timestamp: Date.now() },
+            payload: { lat: latitude, lng: longitude, heading, speed, timestamp: now },
           });
+
+          // Sync to Database every 10 seconds so late joiners get initial location
+          if (now - lastDbUpdate > 10000) {
+            lastDbUpdate = now;
+            await supabase.from('route_runs').update({
+              current_lat: latitude,
+              current_lng: longitude,
+              location_updated_at: new Date(now).toISOString()
+            }).eq('id', runId);
+          }
         }
       },
       (err) => {

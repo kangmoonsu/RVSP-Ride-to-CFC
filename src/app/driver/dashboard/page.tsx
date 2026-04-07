@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { updateRunStatus } from '@/app/actions/runs';
+import { updateRunStatus, checkOffStop } from '@/app/actions/runs';
 import { deleteRoute } from '@/app/actions/routes';
 import { approveBooking } from '@/app/actions/bookings';
 import { signOut } from '@/app/actions/auth';
@@ -172,15 +172,30 @@ export default async function DriverDashboard() {
                           return (
                             <div key={stop.id} className="flex items-start gap-3">
                               <div className="flex flex-col items-center">
-                                <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs shrink-0">
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${run.completed_stop_ids?.includes(stop.id) ? 'bg-surface-container-high text-on-surface-variant' : 'bg-primary text-on-primary'}`}>
                                   {stop.stop_order}
                                 </div>
                                 {index < stops.length - 1 && (
-                                  <div className="w-0.5 flex-1 min-h-6 bg-outline-variant/30 my-1" />
+                                  <div className={`w-0.5 flex-1 min-h-6 my-1 ${run.completed_stop_ids?.includes(stop.id) ? 'bg-surface-container-high' : 'bg-outline-variant/30'}`} />
                                 )}
                               </div>
                               <div className="flex-1 pb-2">
-                                <h5 className="font-bold text-on-surface text-sm">{stop.location_name}</h5>
+                                <div className="flex justify-between items-start">
+                                  <h5 className={`font-bold text-sm ${run.completed_stop_ids?.includes(stop.id) ? 'text-on-surface-variant line-through' : 'text-on-surface'}`}>{stop.location_name}</h5>
+                                  
+                                  {run.status === 'in-progress' && !run.completed_stop_ids?.includes(stop.id) && (
+                                    <form action={checkOffStop.bind(null, run.id, stop.id)}>
+                                      <button type="submit" className="text-[10px] font-bold bg-secondary/10 text-secondary hover:bg-secondary hover:text-on-secondary transition-colors px-2 py-1 rounded-md border border-secondary/20">
+                                        Check Off
+                                      </button>
+                                    </form>
+                                  )}
+                                  {run.completed_stop_ids?.includes(stop.id) && (
+                                    <span className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1 bg-surface-container px-2 py-1 rounded-md">
+                                      <span className="material-symbols-outlined text-[10px]">check</span> Passed
+                                    </span>
+                                  )}
+                                </div>
                                 {pickups.length > 0 ? (
                                   <ul className="mt-2 space-y-2">
                                     {pickups.map((p: any) => (

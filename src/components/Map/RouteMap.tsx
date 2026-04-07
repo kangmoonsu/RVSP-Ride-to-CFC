@@ -9,6 +9,7 @@ export interface StopData {
   lat: number;
   lng: number;
   sequence: number;
+  isCompleted?: boolean;
 }
 
 export interface RouteMapProps {
@@ -74,6 +75,7 @@ export default function RouteMap({ stops, onMapClick, onMarkerDragEnd, height = 
               draggable={!!onMarkerDragEnd}
               label={{ text: stop.sequence.toString(), color: 'white', fontWeight: 'bold' }}
               title={stop.name}
+              icon={stop.isCompleted ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : undefined}
               onDragEnd={(e) => {
                 if (onMarkerDragEnd && e.latLng) {
                   onMarkerDragEnd(stop.id, e.latLng.lat(), e.latLng.lng());

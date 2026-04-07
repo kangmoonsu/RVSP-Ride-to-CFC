@@ -217,6 +217,8 @@ export default async function RiderDashboard() {
                         </p>
                         <LiveRiderTracker
                           runId={run.id}
+                          initialCompletedStops={run.completed_stop_ids || []}
+                          initialLocation={run.current_lat && run.current_lng ? { lat: run.current_lat, lng: run.current_lng } : null}
                           stops={run.route.route_stops?.map((s: any) => ({
                             id: s.id,
                             name: s.location_name,
