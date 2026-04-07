@@ -27,7 +27,7 @@ export default async function DriverDashboard() {
     .select(`
       *,
       route:routes(name, description, route_stops(id, location_name, stop_order, lat, lng)),
-      ride_bookings(id, pickup_stop_id, needs_return_ride, status, rider:users!ride_bookings_rider_id_fkey(full_name, phone_number))
+      ride_bookings(id, pickup_stop_id, needs_return_ride, status, rider:users!ride_bookings_rider_id_fkey(full_name))
     `)
     .eq('driver_id', dbUser.id)
     .order('scheduled_date', { ascending: true });

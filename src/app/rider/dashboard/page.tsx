@@ -194,7 +194,7 @@ export default async function RiderDashboard() {
                             type="checkbox"
                             name="needs_return_ride"
                             value="true"
-                            className="w-5 h-5 rounded accent-primary"
+                            className="w-5 h-5 rounded border border-outline-variant/60 flex shrink-0 items-center justify-center accent-primary appearance-auto"
                           />
                           <span className="text-sm font-semibold text-on-surface-variant select-none">I need a return ride</span>
                         </label>

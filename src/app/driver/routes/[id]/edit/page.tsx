@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { updateRouteBlueprint } from '@/app/actions/routes';
 
-export default async function DriverEditRoutePage({ params }: { params: { id: string } }) {
+export default async function DriverEditRoutePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -15,7 +16,7 @@ export default async function DriverEditRoutePage({ params }: { params: { id: st
   const { data: routeData } = await supabase
     .from('routes')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', resolvedParams.id)
     .eq('default_driver_id', user.id)
     .single();
 

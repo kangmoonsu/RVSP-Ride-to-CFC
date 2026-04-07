@@ -65,16 +65,21 @@ export async function approveBooking(bookingId: string) {
   if (!user) throw new Error('Not authenticated')
 
   // Update status
-  const { data: updatedBooking, error } = await supabase
+  const { data, error } = await supabase
     .from('ride_bookings')
     .update({ status: 'confirmed' })
     .eq('id', bookingId)
     .select('*, rider:users!ride_bookings_rider_id_fkey(email, full_name), run:route_runs(scheduled_date, route:routes(name))')
-    .single()
 
-  if (error || !updatedBooking) {
-    throw new Error(error?.message || 'Update failed')
+  if (error) {
+    throw new Error(error.message || 'Update failed')
   }
+  
+  if (!data || data.length === 0) {
+    throw new Error('Booking not found or you do not have permission to update it.')
+  }
+
+  const updatedBooking = data[0];
 
   const resendApiKey = process.env.RESEND_API_KEY
   if (resendApiKey) {
