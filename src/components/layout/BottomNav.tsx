@@ -15,19 +15,19 @@ const navItems: Record<Role, NavItem[]> = {
   rider: [
     { label: 'Dashboard', icon: 'home', href: '/rider/dashboard' },
     { label: 'My Rides', icon: 'local_activity', href: '/rider/dashboard#bookings' },
-    { label: 'Profile', icon: 'account_circle', href: '/dashboard' },
+    { label: 'Profile', icon: 'account_circle', href: '/profile' },
   ],
   driver: [
     { label: 'Dashboard', icon: 'home', href: '/driver/dashboard' },
     { label: 'Routes', icon: 'route', href: '/driver/dashboard#routes' },
     { label: 'New Route', icon: 'add_road', href: '/driver/routes/new' },
-    { label: 'Profile', icon: 'account_circle', href: '/dashboard' },
+    { label: 'Profile', icon: 'account_circle', href: '/profile' },
   ],
   coordinator: [
     { label: 'Home', icon: 'home', href: '/coordinator/dashboard' },
     { label: 'Routes', icon: 'route', href: '/coordinator/dashboard#routes' },
     { label: 'Drivers', icon: 'person_pin', href: '/coordinator/dashboard#drivers' },
-    { label: 'Profile', icon: 'account_circle', href: '/dashboard' },
+    { label: 'Profile', icon: 'account_circle', href: '/profile' },
   ],
 };
 
@@ -42,7 +42,7 @@ export default function BottomNav({ role }: { role: Role }) {
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       {items.map((item) => {
-        const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href.split('#')[0]));
+        const isActive = pathname === item.href || (item.href !== '/profile' && !item.href.includes('#') && pathname.startsWith(item.href.split('#')[0]));
         return (
           <Link
             key={item.href}
