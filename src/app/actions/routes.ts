@@ -241,6 +241,24 @@ export async function updateRouteBlueprintWithStops(routeId: string, formData: F
     }
   }
 
+  // 4. Update the run's scheduled date/time if provided
+  const runId = formData.get('run_id') as string | null
+  const scheduledDatetime = formData.get('scheduled_datetime') as string | null
+  if (runId && scheduledDatetime) {
+    const runDate = new Date(scheduledDatetime)
+    if (!isNaN(runDate.getTime())) {
+      const { error: runError } = await supabase
+        .from('route_runs')
+        .update({ scheduled_date: runDate.toISOString() })
+        .eq('id', runId)
+        .eq('route_id', routeId)
+      if (runError) {
+        console.error('Error updating run date:', runError)
+        // Non-fatal: still redirect to dashboard
+      }
+    }
+  }
+
   revalidatePath('/driver/dashboard')
   revalidatePath('/rider/dashboard')
   redirect('/driver/dashboard')

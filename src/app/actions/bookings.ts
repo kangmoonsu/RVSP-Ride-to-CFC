@@ -23,19 +23,23 @@ export async function createBooking(formData: FormData) {
   }
 
   // --- Duplicate booking prevention ---
-  // Get the route_id for this run
+  // Get the route_id for this run, and only look at runs that are still active
   const { data: runData } = await supabase.from('route_runs').select('route_id').eq('id', runId).single()
   if (runData?.route_id) {
-    // Find all runs for this route
-    const { data: routeRuns } = await supabase.from('route_runs').select('id').eq('route_id', runData.route_id)
-    if (routeRuns && routeRuns.length > 0) {
-      const runIds = routeRuns.map(r => r.id)
-      // Check if rider already has a confirmed/pending booking on any run of this route
+    // Find only ACTIVE (scheduled/in-progress) runs for this route — NOT completed ones
+    const { data: activeRouteRuns } = await supabase
+      .from('route_runs')
+      .select('id')
+      .eq('route_id', runData.route_id)
+      .in('status', ['scheduled', 'in-progress'])
+    if (activeRouteRuns && activeRouteRuns.length > 0) {
+      const activeRunIds = activeRouteRuns.map(r => r.id)
+      // Check if rider already has a confirmed/pending booking on any ACTIVE run of this route
       const { data: existingBooking } = await supabase
         .from('ride_bookings')
         .select('id, status')
         .eq('rider_id', dbUser.id)
-        .in('run_id', runIds)
+        .in('run_id', activeRunIds)
         .in('status', ['pending', 'confirmed'])
         .maybeSingle()
 

@@ -85,6 +85,7 @@ export async function completeAndRecreateRun(runId: string, recreateNextWeek: bo
 
   revalidatePath('/coordinator/dashboard')
   revalidatePath('/driver/dashboard')
+  revalidatePath('/rider/dashboard')
 }
 
 export async function getActiveRuns() {

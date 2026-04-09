@@ -9,11 +9,30 @@ import Link from 'next/link';
 const RouteMap = dynamic(() => import('@/components/Map/RouteMap'), { ssr: false });
 const libraries: "places"[] = ["places"];
 
-export default function EditRouteForm({ route, initialStops }: { route: any, initialStops: any[] }) {
+export default function EditRouteForm({
+  route,
+  initialStops,
+  upcomingRun,
+}: {
+  route: any;
+  initialStops: any[];
+  upcomingRun: { id: string; scheduled_date: string } | null;
+}) {
   const [stops, setStops] = useState(
-    initialStops.length > 0 
+    initialStops.length > 0
       ? initialStops.sort((a,b) => a.stop_order - b.stop_order).map((s, i) => ({ id: s.id, location_name: s.location_name, lat: s.lat, lng: s.lng, sequence: i + 1 }))
       : [{ id: Math.random().toString(), location_name: '', lat: 0, lng: 0, sequence: 1 }]
+  );
+
+  // Convert the stored UTC date to local datetime-local string for the input
+  const toLocalDatetimeStr = (isoStr: string) => {
+    const d = new Date(isoStr);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const [scheduledDatetime, setScheduledDatetime] = useState(
+    upcomingRun ? toLocalDatetimeStr(upcomingRun.scheduled_date) : ''
   );
   
   const { isLoaded, loadError } = useJsApiLoader({
@@ -241,6 +260,25 @@ export default function EditRouteForm({ route, initialStops }: { route: any, ini
                   className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all"
                 />
               </div>
+
+              {/* ── Scheduled Date & Time ── */}
+              {upcomingRun && (
+                <div className="space-y-2 mt-8">
+                  <label htmlFor="scheduled_datetime" className="block text-sm font-bold text-on-surface-variant uppercase tracking-widest">
+                    Next Departure Date &amp; Time
+                  </label>
+                  <p className="text-xs text-on-surface-variant">Update the date/time of the next scheduled run.</p>
+                  <input
+                    type="datetime-local"
+                    id="scheduled_datetime"
+                    name="scheduled_datetime"
+                    value={scheduledDatetime}
+                    onChange={(e) => setScheduledDatetime(e.target.value)}
+                    className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all"
+                  />
+                  <input type="hidden" name="run_id" value={upcomingRun.id} />
+                </div>
+              )}
 
               <div className="pt-6 border-t border-outline-variant/20 mt-6">
                 <button type="submit" className="w-full bg-primary text-on-primary font-bold py-4 rounded-full shadow-lg hover:bg-primary-container transition-colors">

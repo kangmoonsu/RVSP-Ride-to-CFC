@@ -41,10 +41,14 @@ export default async function RiderDashboard() {
     myBookings?.some((b: any) => b.run_id === run.id && b.status === 'confirmed')
   ) || [];
 
-  // Set of route_ids the rider already has an active booking on
+  // Set of route_ids the rider already has an active booking on an ACTIVE run.
+  // Excludes completed runs so riders can book newly recreated runs for the same route.
   const bookedRouteIds = new Set(
     myBookings
-      ?.filter((b: any) => ['pending', 'confirmed'].includes(b.status))
+      ?.filter((b: any) =>
+        ['pending', 'confirmed'].includes(b.status) &&
+        ['scheduled', 'in-progress'].includes(b.run?.status)
+      )
       .map((b: any) => b.run?.route_id)
       .filter(Boolean) ?? []
   );

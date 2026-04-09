@@ -40,7 +40,7 @@ export default async function DriverDashboard() {
     .order('created_at', { ascending: false });
 
   const activeRunsData = assignedRuns?.filter((r: any) => r.status === 'scheduled' || r.status === 'in-progress') || [];
-  const completedRunsData = assignedRuns?.filter((r: any) => r.status === 'completed') || [];
+
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
@@ -236,31 +236,6 @@ export default async function DriverDashboard() {
             </div>
           )}
         </section>
-
-        {/* ── Completed Runs ── */}
-        {completedRunsData.length > 0 && (
-          <section className="mb-8" id="completed-runs">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-outline text-[18px]" aria-hidden="true">task_alt</span>
-              Completed Runs
-            </h2>
-            <div className="space-y-4 opacity-75">
-              {completedRunsData.map((run: any) => (
-                <div key={run.id} className="bg-surface-container-lowest p-4 rounded-3xl border border-outline-variant/10 shadow-sm flex justify-between items-center">
-                  <div>
-                    <h3 className="text-sm font-bold text-on-surface-variant line-through">{run.route?.name}</h3>
-                    <p className="text-on-surface-variant/80 text-[10px] mt-1">
-                      {new Date(run.scheduled_date).toLocaleString()}
-                    </p>
-                  </div>
-                  <span className="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-surface-container text-on-surface-variant shrink-0">
-                    Completed
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* ── My Managed Routes ── */}
         <section id="routes">

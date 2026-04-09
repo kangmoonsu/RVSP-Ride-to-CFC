@@ -25,11 +25,28 @@ export default async function DriverEditRoutePage({ params }: { params: Promise<
     redirect('/driver/dashboard');
   }
 
-  const { data: stopsData } = await supabase
-    .from('route_stops')
-    .select('*')
-    .eq('route_id', route.id)
-    .order('stop_order', { ascending: true });
+  const [stopsResult, upcomingRunResult] = await Promise.all([
+    supabase
+      .from('route_stops')
+      .select('*')
+      .eq('route_id', route.id)
+      .order('stop_order', { ascending: true }),
+    // Fetch the next scheduled/in-progress run so the driver can edit its date
+    supabase
+      .from('route_runs')
+      .select('id, scheduled_date')
+      .eq('route_id', route.id)
+      .in('status', ['scheduled', 'in-progress'])
+      .order('scheduled_date', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  return <EditRouteForm route={route} initialStops={stopsData || []} />;
+  return (
+    <EditRouteForm
+      route={route}
+      initialStops={stopsResult.data || []}
+      upcomingRun={upcomingRunResult.data ?? null}
+    />
+  );
 }
