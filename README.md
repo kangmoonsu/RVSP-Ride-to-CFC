@@ -1,6 +1,6 @@
 # 🚐 CFC Ride — Church Ride Coordination App
 
-A mobile-first web application that connects **church members who need a ride** with **volunteer drivers**, coordinated by a church administrator. Built for [Cornerstone Fellowship Church (CFC)](https://cfctx.com).
+A mobile-first web application that connects **church members who need a ride** with **volunteer drivers**, coordinated by a church administrator. Built for [Convenant Fellowship Church (CFC)](https://www.cfchome.org/).
 
 ---
 
