@@ -106,7 +106,7 @@ export async function createDriverRouteWithRun(formData: FormData) {
     schedule_time: null,
     rsvp_day: null,
     rsvp_time: null
-  }).select().single()
+  } as any).select().single()
 
   if (routeError || !route) {
     console.error('Error creating route:', routeError)
@@ -188,7 +188,7 @@ export async function updateRouteBlueprint(routeId: string, formData: FormData) 
 
   const { error } = await supabase.from('routes').update({
     capacity
-  }).eq('id', routeId).eq('default_driver_id', user.id)
+  } as any).eq('id', routeId).eq('default_driver_id', user.id)
 
   if (error) {
     console.error('Error updating route:', error)
