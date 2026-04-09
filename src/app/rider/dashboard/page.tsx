@@ -4,7 +4,8 @@ import { getActiveRuns } from '@/app/actions/runs';
 import { getRiderBookings, createBooking } from '@/app/actions/bookings';
 import { signOut } from '@/app/actions/auth';
 import Link from 'next/link';
-import LiveRiderTracker from '@/components/Map/LiveRiderTracker';
+// import LiveRiderTracker from '@/components/Map/LiveRiderTracker';
+import LiveRiderStopsTracker from '@/components/Map/LiveRiderStopsTracker';
 import BottomNav from '@/components/layout/BottomNav';
 
 export default async function RiderDashboard() {
@@ -210,23 +211,29 @@ export default async function RiderDashboard() {
                     )}
 
                     {run.status === 'in-progress' && (
-                      <div>
-                        <p className="text-sm font-bold text-secondary mb-2 flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[18px]" aria-hidden="true">navigation</span>
-                          Driver is en route — tracking live:
-                        </p>
-                        <LiveRiderTracker
-                          runId={run.id}
-                          initialCompletedStops={run.completed_stop_ids || []}
-                          initialLocation={run.current_lat && run.current_lng ? { lat: run.current_lat, lng: run.current_lng } : null}
-                          stops={run.route.route_stops?.map((s: any) => ({
-                            id: s.id,
-                            name: s.location_name,
-                            lat: s.lat,
-                            lng: s.lng,
-                            sequence: s.stop_order
-                          })) || []}
-                        />
+                      <div className="mt-4">
+                        {myBookings && myBookings.find((b: any) => b.run?.id === run.id) ? (
+                          <>
+                            <p className="text-sm font-bold text-secondary mb-2 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">routing</span>
+                              Live Tracking:
+                            </p>
+                            <LiveRiderStopsTracker
+                              runId={run.id}
+                              myStopId={myBookings.find((b: any) => b.run?.id === run.id)?.pickup_stop_id}
+                              initialCompletedStops={run.completed_stop_ids || []}
+                              stops={run.route.route_stops?.map((s: any) => ({
+                                id: s.id,
+                                name: s.location_name,
+                                sequence: s.stop_order
+                              })) || []}
+                            />
+                          </>
+                        ) : (
+                          <div className="bg-surface-container text-on-surface-variant p-3 rounded-xl text-center text-sm font-semibold">
+                             Book a seat to track your pickup.
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

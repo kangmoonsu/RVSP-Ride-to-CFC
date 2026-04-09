@@ -5,8 +5,9 @@ import { deleteRoute } from '@/app/actions/routes';
 import { approveBooking } from '@/app/actions/bookings';
 import { signOut } from '@/app/actions/auth';
 import Link from 'next/link';
-import LiveDriverBroadcaster from '@/components/Map/LiveDriverBroadcaster';
+// import LiveDriverBroadcaster from '@/components/Map/LiveDriverBroadcaster';
 import BottomNav from '@/components/layout/BottomNav';
+import DriverRunActions from '@/components/DriverRunActions';
 
 export default async function DriverDashboard() {
   const supabase = await createClient();
@@ -37,6 +38,9 @@ export default async function DriverDashboard() {
     .select('id, name, capacity, description, schedule_day, schedule_time, rsvp_day, rsvp_time')
     .eq('default_driver_id', dbUser.id)
     .order('created_at', { ascending: false });
+
+  const activeRunsData = assignedRuns?.filter((r: any) => r.status === 'scheduled' || r.status === 'in-progress') || [];
+  const completedRunsData = assignedRuns?.filter((r: any) => r.status === 'completed') || [];
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
@@ -111,7 +115,7 @@ export default async function DriverDashboard() {
             </Link>
           </div>
 
-          {!assignedRuns || assignedRuns.length === 0 ? (
+          {!activeRunsData || activeRunsData.length === 0 ? (
             <div className="bg-surface-container-lowest p-10 rounded-3xl border border-outline-variant/10 text-center shadow-sm">
               <span className="material-symbols-outlined text-outline text-5xl mb-3 block" aria-hidden="true">assignment_turned_in</span>
               <h3 className="text-base font-bold text-on-surface mb-1">No Assigned Runs</h3>
@@ -119,7 +123,7 @@ export default async function DriverDashboard() {
             </div>
           ) : (
             <div className="space-y-4">
-              {assignedRuns.map((run: any) => {
+              {activeRunsData.map((run: any) => {
                 const stops = run.route?.route_stops?.sort((a: any, b: any) => a.stop_order - b.stop_order) || [];
                 const passengers = run.ride_bookings || [];
                 const isActionable = run.status === 'scheduled' || run.status === 'in-progress';
@@ -143,25 +147,16 @@ export default async function DriverDashboard() {
 
                       {/* Start / Complete button */}
                       {isActionable && (
-                        <form action={updateRunStatus.bind(null, run.id, run.status === 'scheduled' ? 'in-progress' : 'completed')}>
-                          <button
-                            className={`btn-active w-full h-12 font-bold rounded-2xl shadow-sm text-sm flex items-center justify-center gap-2 text-on-primary ${run.status === 'scheduled' ? 'bg-primary' : 'bg-secondary'}`}
-                          >
-                            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
-                              {run.status === 'scheduled' ? 'play_arrow' : 'stop'}
-                            </span>
-                            {run.status === 'scheduled' ? 'Start Run' : 'Complete Run'}
-                          </button>
-                        </form>
+                        <DriverRunActions runId={run.id} runStatus={run.status} />
                       )}
                     </div>
 
-                    {/* Live broadcaster */}
+                    {/* Live broadcaster (Temporarily disabled for Beta)
                     {run.status === 'in-progress' && (
                       <div className="px-4 pb-3">
                         <LiveDriverBroadcaster runId={run.id} />
                       </div>
-                    )}
+                    )} */}
 
                     {/* Stops & Passengers */}
                     <div className="bg-surface-container-low rounded-b-3xl p-4 border-t border-outline-variant/10">
@@ -241,6 +236,31 @@ export default async function DriverDashboard() {
             </div>
           )}
         </section>
+
+        {/* ── Completed Runs ── */}
+        {completedRunsData.length > 0 && (
+          <section className="mb-8" id="completed-runs">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined text-outline text-[18px]" aria-hidden="true">task_alt</span>
+              Completed Runs
+            </h2>
+            <div className="space-y-4 opacity-75">
+              {completedRunsData.map((run: any) => (
+                <div key={run.id} className="bg-surface-container-lowest p-4 rounded-3xl border border-outline-variant/10 shadow-sm flex justify-between items-center">
+                  <div>
+                    <h3 className="text-sm font-bold text-on-surface-variant line-through">{run.route?.name}</h3>
+                    <p className="text-on-surface-variant/80 text-[10px] mt-1">
+                      {new Date(run.scheduled_date).toLocaleString()}
+                    </p>
+                  </div>
+                  <span className="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-surface-container text-on-surface-variant shrink-0">
+                    Completed
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── My Managed Routes ── */}
         <section id="routes">

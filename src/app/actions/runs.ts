@@ -45,6 +45,48 @@ export async function updateRunStatus(runId: string, status: 'scheduled' | 'in-p
   revalidatePath('/driver/dashboard')
 }
 
+export async function completeAndRecreateRun(runId: string, recreateNextWeek: boolean) {
+  const supabase = await createClient()
+
+  // First mark the current run as completed
+  const { error: updateError } = await supabase.from('route_runs').update({
+    status: 'completed'
+  }).eq('id', runId)
+
+  if (updateError) {
+    console.error('Error completing run:', updateError)
+    throw new Error(updateError.message)
+  }
+
+  // If driver requested to recreate the run for next week
+  if (recreateNextWeek) {
+    const { data: run, error: fetchError } = await supabase.from('route_runs').select('*').eq('id', runId).single()
+    
+    if (fetchError || !run) {
+      console.error('Error fetching run to recreate:', fetchError)
+      throw new Error(fetchError?.message || 'Run not found')
+    }
+
+    const nextDate = new Date(run.scheduled_date)
+    nextDate.setDate(nextDate.getDate() + 7)
+
+    const { error: createError } = await supabase.from('route_runs').insert({
+      route_id: run.route_id,
+      scheduled_date: nextDate.toISOString(),
+      driver_id: run.driver_id,
+      status: 'scheduled'
+    })
+
+    if (createError) {
+      console.error('Error recreating run:', createError)
+      throw new Error(createError.message)
+    }
+  }
+
+  revalidatePath('/coordinator/dashboard')
+  revalidatePath('/driver/dashboard')
+}
+
 export async function getActiveRuns() {
   const supabase = await createClient()
   const { data, error } = await supabase.from('route_runs').select(`
