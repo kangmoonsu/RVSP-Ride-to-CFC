@@ -247,60 +247,16 @@ function DriverNewRouteForm() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-bold text-on-surface-variant uppercase tracking-widest">Recurring Departure Schedule</label>
-              <p className="text-xs text-on-surface-variant mb-2">Select the weekly day and time your route departs.</p>
-              <div className="grid grid-cols-2 gap-4">
-                <select 
-                  name="schedule_day" 
-                  required 
-                  defaultValue=""
-                  className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all appearance-none"
-                >
-                  <option value="" disabled>Select Day</option>
-                  <option value="Sunday">Sunday</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                </select>
-                <input 
-                  type="time" 
-                  name="schedule_time" 
-                  required 
-                  className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all"
-                />
-              </div>
+              <label className="block text-sm font-bold text-on-surface-variant uppercase tracking-widest">Departure Date & Time</label>
+              <p className="text-xs text-on-surface-variant mb-2">When does this ride depart?</p>
+              <input 
+                type="datetime-local" 
+                name="departure_datetime" 
+                required 
+                className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all"
+              />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-bold text-on-surface-variant uppercase tracking-widest">RSVP Deadline</label>
-              <p className="text-xs text-on-surface-variant mb-2">When do riders need to confirm by?</p>
-              <div className="grid grid-cols-2 gap-4">
-                <select 
-                  name="rsvp_day" 
-                  required 
-                  defaultValue=""
-                  className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all appearance-none"
-                >
-                  <option value="" disabled>Select Day</option>
-                  <option value="Sunday">Sunday</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                </select>
-                <input 
-                  type="time" 
-                  name="rsvp_time" 
-                  required 
-                  className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all"
-                />
-              </div>
-            </div>
 
             <div className="pt-6">
               <button type="submit" className="w-full bg-primary text-on-primary font-bold py-4 rounded-full shadow-lg hover:bg-primary-container transition-colors">

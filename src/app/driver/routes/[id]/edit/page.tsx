@@ -39,8 +39,8 @@ export default async function DriverEditRoutePage({ params }: { params: Promise<
 
       <main className="pt-24 px-4 max-w-xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-primary tracking-tight mb-2">Modify Schedule</h1>
-          <p className="text-on-surface-variant text-sm">Update the recurring schedule and capacity for your route blueprint: <strong>{route.name}</strong></p>
+          <h1 className="text-3xl font-extrabold text-primary tracking-tight mb-2">Modify Route Settings</h1>
+          <p className="text-on-surface-variant text-sm">Update the capacity for your route blueprint: <strong>{route.name}</strong></p>
         </div>
 
         <form action={updateRouteWithId} className="space-y-6">
@@ -59,61 +59,6 @@ export default async function DriverEditRoutePage({ params }: { params: Promise<
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-bold text-on-surface-variant uppercase tracking-widest">Recurring Departure Schedule</label>
-              <div className="grid grid-cols-2 gap-4">
-                <select 
-                  name="schedule_day" 
-                  required 
-                  defaultValue={route.schedule_day || ''}
-                  className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all appearance-none"
-                >
-                  <option value="" disabled>Select Day</option>
-                  <option value="Sunday">Sunday</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                </select>
-                <input 
-                  type="time" 
-                  name="schedule_time" 
-                  defaultValue={route.schedule_time || ''}
-                  required 
-                  className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-bold text-on-surface-variant uppercase tracking-widest">RSVP Deadline</label>
-              <div className="grid grid-cols-2 gap-4">
-                <select 
-                  name="rsvp_day" 
-                  required 
-                  defaultValue={route.rsvp_day || ''}
-                  className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all appearance-none"
-                >
-                  <option value="" disabled>Select Day</option>
-                  <option value="Sunday">Sunday</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                </select>
-                <input 
-                  type="time" 
-                  name="rsvp_time" 
-                  defaultValue={route.rsvp_time || ''}
-                  required 
-                  className="w-full bg-surface-container text-on-surface px-4 py-4 rounded-xl border-none focus:ring-2 focus:ring-primary transition-all"
-                />
-              </div>
-            </div>
 
             <div className="pt-6 border-t border-outline-variant/20">
               <button type="submit" className="w-full bg-primary text-on-primary font-bold py-4 rounded-full shadow-lg hover:bg-primary-container transition-colors">

@@ -282,10 +282,6 @@ export default async function DriverDashboard() {
                   <h3 className="text-base font-bold text-on-surface mb-1">{route.name}</h3>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-on-surface-variant mb-4">
                     <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px]" aria-hidden="true">event_repeat</span>
-                      Every {route.schedule_day} at {route.schedule_time}
-                    </span>
-                    <span className="flex items-center gap-1">
                       <span className="material-symbols-outlined text-[14px]" aria-hidden="true">airline_seat_recline_normal</span>
                       {route.capacity || 4} seats
                     </span>
