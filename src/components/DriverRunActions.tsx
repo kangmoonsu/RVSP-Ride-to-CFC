@@ -44,39 +44,34 @@ export default function DriverRunActions({ runId, runStatus }: DriverRunActionsP
           : 'Complete Run'}
       </button>
 
-      {/* Custom Confirmation Modal */}
+      {/* Toast UI Settings */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-surface/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 w-full max-w-sm shadow-xl animate-in zoom-in-95 duration-200">
-            <div className="flex items-center gap-3 mb-4 text-on-surface">
-              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
-                <span className="material-symbols-outlined">event_repeat</span>
+        <div className="fixed bottom-20 left-0 right-0 z-[100] px-4 pointer-events-none flex justify-center animate-in slide-in-from-bottom-8 fade-in duration-300">
+          <div className="bg-surface-container-high text-on-surface p-4 rounded-3xl shadow-xl border border-outline-variant/10 w-full max-w-sm pointer-events-auto">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary shrink-0 mt-0.5">
+                <span className="material-symbols-outlined text-[18px]">event_repeat</span>
               </div>
-              <h3 className="text-lg font-bold">Route Complete!</h3>
+              <div>
+                <h3 className="text-base font-bold">Route Completed</h3>
+                <p className="text-on-surface-variant text-xs mt-1 leading-relaxed">
+                  Automatically create and schedule this exact same route for next week?
+                </p>
+              </div>
             </div>
             
-            <p className="text-on-surface-variant text-sm mb-6 leading-relaxed">
-              Would you like to automatically create and schedule this exact same route for next week?
-            </p>
-            
-            <div className="space-y-3">
-              <button
-                onClick={() => handleCompleteChoice(true)}
-                className="w-full h-12 bg-primary text-on-primary font-bold rounded-2xl shadow-sm text-sm flex items-center justify-center hover:opacity-90 transition-opacity active:scale-[0.98]"
-              >
-                Yes, schedule for next week
-              </button>
+            <div className="flex gap-2">
               <button
                 onClick={() => handleCompleteChoice(false)}
-                className="w-full h-12 bg-surface-container text-on-surface font-bold rounded-2xl shadow-sm text-sm flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-[0.98]"
+                className="flex-1 h-10 bg-surface-container-lowest text-on-surface font-bold rounded-2xl shadow-sm border border-outline-variant/20 text-xs flex items-center justify-center hover:bg-surface-container transition-colors active:scale-95"
               >
-                No, just finish run
+                No, just finish
               </button>
               <button
-                onClick={() => setShowModal(false)}
-                className="w-full h-10 text-on-surface-variant font-semibold text-xs flex items-center justify-center mt-2 decoration-transparent hover:underline"
+                onClick={() => handleCompleteChoice(true)}
+                className="flex-1 h-10 bg-primary text-on-primary font-bold rounded-2xl shadow-sm text-xs flex items-center justify-center hover:opacity-90 transition-opacity active:scale-95"
               >
-                Cancel
+                Yes, schedule
               </button>
             </div>
           </div>
