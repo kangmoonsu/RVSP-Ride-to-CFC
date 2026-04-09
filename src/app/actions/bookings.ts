@@ -22,6 +22,30 @@ export async function createBooking(formData: FormData) {
     throw new Error('User profile not found')
   }
 
+  // --- Duplicate booking prevention ---
+  // Get the route_id for this run
+  const { data: runData } = await supabase.from('route_runs').select('route_id').eq('id', runId).single()
+  if (runData?.route_id) {
+    // Find all runs for this route
+    const { data: routeRuns } = await supabase.from('route_runs').select('id').eq('route_id', runData.route_id)
+    if (routeRuns && routeRuns.length > 0) {
+      const runIds = routeRuns.map(r => r.id)
+      // Check if rider already has a confirmed/pending booking on any run of this route
+      const { data: existingBooking } = await supabase
+        .from('ride_bookings')
+        .select('id, status')
+        .eq('rider_id', dbUser.id)
+        .in('run_id', runIds)
+        .in('status', ['pending', 'confirmed'])
+        .maybeSingle()
+
+      if (existingBooking) {
+        throw new Error('You already have an active booking for this route.')
+      }
+    }
+  }
+  // --- End duplicate check ---
+
   const { error } = await supabase.from('ride_bookings').insert({
     run_id: runId,
     rider_id: dbUser.id,
@@ -38,15 +62,18 @@ export async function createBooking(formData: FormData) {
   revalidatePath('/rider/dashboard')
 }
 
+
 export async function getRiderBookings(riderId: string) {
   const supabase = await createClient()
   
   const { data, error } = await supabase.from('ride_bookings').select(`
     *,
     run:route_runs(
+      id,
       scheduled_date, 
-      status, 
-      route:routes(name)
+      status,
+      route_id,
+      route:routes(id, name)
     ),
     pickup_stop:route_stops(location_name)
   `).eq('rider_id', riderId).order('created_at', { ascending: false })

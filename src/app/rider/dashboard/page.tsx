@@ -34,6 +34,20 @@ export default async function RiderDashboard() {
     getRiderBookings(dbUser.id)
   ]);
 
+  // Runs that are currently in-progress AND the rider has a confirmed booking for
+  const inProgressMyRuns = activeRuns?.filter((run: any) =>
+    run.status === 'in-progress' &&
+    myBookings?.some((b: any) => b.run_id === run.id && b.status === 'confirmed')
+  ) || [];
+
+  // Set of route_ids the rider already has an active booking on
+  const bookedRouteIds = new Set(
+    myBookings
+      ?.filter((b: any) => ['pending', 'confirmed'].includes(b.status))
+      .map((b: any) => b.run?.route_id)
+      .filter(Boolean) ?? []
+  );
+
   return (
     <div className="min-h-screen bg-surface flex flex-col">
       {/* Mobile sticky header */}
@@ -86,6 +100,34 @@ export default async function RiderDashboard() {
             Switch to Driver View
           </Link>
         </div>
+
+        {/* ── In-Progress Ride Alert Banner ── */}
+        {inProgressMyRuns.length > 0 && (
+          <section className="mb-6">
+            {inProgressMyRuns.map((run: any) => {
+              const myBooking = myBookings?.find((b: any) => b.run_id === run.id);
+              return (
+                <div key={run.id} className="bg-primary text-on-primary rounded-3xl p-4 shadow-lg">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="relative flex h-3 w-3 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-on-primary opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-on-primary"></span>
+                    </div>
+                    <p className="font-extrabold text-sm uppercase tracking-wider">Your Ride is On the Way!</p>
+                  </div>
+                  <p className="font-bold text-base mb-1">{run.route?.name}</p>
+                  <p className="text-on-primary/70 text-xs mb-4">Driver: {run.driver?.full_name}</p>
+                  <LiveRiderStopsTracker
+                    runId={run.id}
+                    myStopId={myBooking?.pickup_stop_id}
+                    initialCompletedStops={run.completed_stop_ids || []}
+                    stops={run.route?.route_stops?.map((s: any) => ({ id: s.id, name: s.location_name, sequence: s.stop_order })) || []}
+                  />
+                </div>
+              );
+            })}
+          </section>
+        )}
 
         {/* My Bookings — shown first on mobile (top priority info) */}
         {myBookings && myBookings.length > 0 && (
@@ -140,7 +182,10 @@ export default async function RiderDashboard() {
             </div>
           ) : (
             <div className="space-y-4">
-              {activeRuns.map((run: any) => (
+              {activeRuns.map((run: any) => {
+                const alreadyBooked = bookedRouteIds.has(run.route?.id);
+                const myRunBooking = myBookings?.find((b: any) => b.run_id === run.id);
+                return (
                 <div key={run.id} className="bg-surface-container-lowest rounded-3xl border border-outline-variant/10 shadow-sm overflow-hidden">
                   {/* Run header */}
                   <div className="p-4 flex justify-between items-start">
@@ -158,8 +203,10 @@ export default async function RiderDashboard() {
                         Driver: {run.driver ? run.driver.full_name : 'Pending'}
                       </p>
                     </div>
-                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0">
-                      {run.status}
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${
+                      run.status === 'in-progress' ? 'bg-secondary/10 text-secondary' : 'bg-primary/10 text-primary'
+                    }`}>
+                      {run.status === 'in-progress' ? '🟢 Live' : run.status}
                     </span>
                   </div>
 
@@ -168,6 +215,11 @@ export default async function RiderDashboard() {
                     {run.status === 'scheduled' && run.driver_id === dbUser.id ? (
                       <div className="bg-primary/10 text-primary p-3 rounded-xl text-center font-bold text-sm">
                         You are driving this route.
+                      </div>
+                    ) : run.status === 'scheduled' && alreadyBooked ? (
+                      <div className="bg-surface-container text-on-surface-variant p-3 rounded-xl text-center font-semibold text-sm flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                        Already Booked
                       </div>
                     ) : run.status === 'scheduled' && (
                       <form action={createBooking} className="space-y-3">
@@ -210,35 +262,14 @@ export default async function RiderDashboard() {
                       </form>
                     )}
 
-                    {run.status === 'in-progress' && (
-                      <div className="mt-4">
-                        {myBookings && myBookings.find((b: any) => b.run?.id === run.id) ? (
-                          <>
-                            <p className="text-sm font-bold text-secondary mb-2 flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">routing</span>
-                              Live Tracking:
-                            </p>
-                            <LiveRiderStopsTracker
-                              runId={run.id}
-                              myStopId={myBookings.find((b: any) => b.run?.id === run.id)?.pickup_stop_id}
-                              initialCompletedStops={run.completed_stop_ids || []}
-                              stops={run.route.route_stops?.map((s: any) => ({
-                                id: s.id,
-                                name: s.location_name,
-                                sequence: s.stop_order
-                              })) || []}
-                            />
-                          </>
-                        ) : (
-                          <div className="bg-surface-container text-on-surface-variant p-3 rounded-xl text-center text-sm font-semibold">
-                             Book a seat to track your pickup.
-                          </div>
-                        )}
+                    {run.status === 'in-progress' && !myRunBooking && (
+                      <div className="bg-surface-container text-on-surface-variant p-3 rounded-xl text-center text-sm font-semibold">
+                        This ride is in progress. Book a future run to join.
                       </div>
                     )}
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </section>
