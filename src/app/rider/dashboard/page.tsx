@@ -7,6 +7,7 @@ import Link from 'next/link';
 // import LiveRiderTracker from '@/components/Map/LiveRiderTracker';
 import LiveRiderStopsTracker from '@/components/Map/LiveRiderStopsTracker';
 import BottomNav from '@/components/layout/BottomNav';
+import RiderDashboardRefresher from '@/components/RiderDashboardRefresher';
 
 export default async function RiderDashboard() {
   const supabase = await createClient();
@@ -48,8 +49,15 @@ export default async function RiderDashboard() {
       .filter(Boolean) ?? []
   );
 
+  // Run IDs to watch for realtime updates (all active/confirmed bookings)
+  const watchRunIds: string[] = myBookings
+    ?.filter((b: any) => ['pending', 'confirmed'].includes(b.status) && b.run_id)
+    .map((b: any) => b.run_id) ?? [];
+
   return (
     <div className="min-h-screen bg-surface flex flex-col">
+      {/* Realtime watcher: refreshes the page when a driver checks off a stop or starts the run */}
+      <RiderDashboardRefresher watchRunIds={watchRunIds} />
       {/* Mobile sticky header */}
       <header
         className="fixed top-0 left-0 right-0 z-50 flex items-center h-14 px-4 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/10"
