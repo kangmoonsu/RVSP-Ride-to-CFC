@@ -179,13 +179,14 @@ export async function deleteRoute(routeId: string) {
   revalidatePath('/rider/dashboard')
 }
 
-export async function updateRouteBlueprint(routeId: string, formData: FormData) {
+export async function updateRouteBlueprintWithStops(routeId: string, formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
   const capacity = parseInt(formData.get('capacity') as string || '4', 10)
 
+  // 1. Update route capacity
   const { error } = await supabase.from('routes').update({
     capacity
   } as any).eq('id', routeId).eq('default_driver_id', user.id)
@@ -193,6 +194,51 @@ export async function updateRouteBlueprint(routeId: string, formData: FormData) 
   if (error) {
     console.error('Error updating route:', error)
     throw new Error(error.message)
+  }
+
+  // 2. Process submitted stops
+  const stopsCount = parseInt(formData.get('stops_count') as string || '0', 10)
+  const submittedIds = new Set<string>()
+
+  // Fetch existing stops first
+  const { data: existingStops } = await supabase.from('route_stops').select('id, location_name').eq('route_id', routeId)
+  const existingStopIds = new Set(existingStops?.map(s => s.id) || [])
+
+  for (let i = 0; i < stopsCount; i++) {
+    const stopId = formData.get(`stop_${i}_id`) as string
+    const locName = formData.get(`stop_${i}_name`) as string
+    const lat = parseFloat(formData.get(`stop_${i}_lat`) as string || '0')
+    const lng = parseFloat(formData.get(`stop_${i}_lng`) as string || '0')
+
+    if (locName && lat && lng) {
+      if (stopId && stopId.length > 10 && existingStopIds.has(stopId)) {
+        // UPDATE existing stop
+        await supabase.from('route_stops').update({
+          location_name: locName,
+          stop_order: i + 1,
+          lat,
+          lng
+        }).eq('id', stopId)
+        submittedIds.add(stopId)
+      } else {
+        // INSERT new stop (ignore temporary math.random ids)
+        await supabase.from('route_stops').insert({
+          route_id: routeId,
+          location_name: locName,
+          stop_order: i + 1,
+          lat,
+          lng,
+          estimated_offset_minutes: i * 15
+        })
+      }
+    }
+  }
+
+  // 3. Delete removed stops
+  for (const oldId of Array.from(existingStopIds)) {
+    if (!submittedIds.has(oldId)) {
+      await supabase.from('route_stops').delete().eq('id', oldId)
+    }
   }
 
   revalidatePath('/driver/dashboard')

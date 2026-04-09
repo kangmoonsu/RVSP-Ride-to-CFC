@@ -37,6 +37,12 @@ function DriverNewRouteForm() {
     }
   };
 
+  const insertStopAfter = (index: number) => {
+    const newStops = [...stops];
+    newStops.splice(index + 1, 0, { id: Math.random().toString(), location_name: '', lat: 0, lng: 0, sequence: 0 });
+    setStops(newStops.map((s, i) => ({ ...s, sequence: i + 1 })));
+  };
+
   const fetchSuggestions = async (query: string, index: number) => {
     if (!query || query.length < 3) {
       setSuggestions([]);
@@ -223,6 +229,21 @@ function DriverNewRouteForm() {
                          <span className="material-symbols-outlined text-[14px]">check_circle</span> Map pinned (Drag to adjust)
                        </span>
                     )}
+                    
+                    {/* Insert Stop Button Below */}
+                    <div className="relative flex justify-center py-1">
+                      <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div className="w-full border-t border-outline-variant/10"></div>
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => insertStopAfter(index)}
+                        className="relative bg-surface-container-low border border-outline-variant/20 rounded-full w-6 h-6 flex items-center justify-center text-primary hover:bg-primary/10 transition-colors z-10"
+                        title="Insert stop below"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">add</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
