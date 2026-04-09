@@ -141,15 +141,17 @@ export default async function RiderDashboard() {
           </section>
         )}
 
-        {/* My Bookings — shown first on mobile (top priority info) */}
-        {myBookings && myBookings.length > 0 && (
+        {/* My Bookings — only show active (non-completed) runs */}
+        {myBookings && myBookings.filter((b: any) => b.run?.status !== 'completed').length > 0 && (
           <section id="bookings" className="mb-8">
             <h2 className="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-3 flex items-center gap-2">
               <span className="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">local_activity</span>
               My Bookings
             </h2>
             <div className="space-y-3">
-              {myBookings.map((booking: any) => (
+              {myBookings
+                .filter((b: any) => b.run?.status !== 'completed')
+                .map((booking: any) => (
                 <div key={booking.id} className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/10 shadow-sm">
                   <div className="flex justify-between items-start mb-2">
                     <p className="font-bold text-on-surface text-sm">{booking.run?.route?.name}</p>
